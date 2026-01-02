@@ -18,14 +18,6 @@ interface StepOnboardingProps {
   onNext: () => void;
 }
 
-const shell =
-  "rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]";
-const label = "text-xs font-semibold uppercase tracking-wider text-zinc-400";
-const inputBase =
-  "h-12 rounded-2xl border border-white/10 bg-black/30 text-white placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:ring-offset-0";
-const textAreaBase =
-  "min-h-28 rounded-2xl border border-white/10 bg-black/30 text-white placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none";
-
 export function StepOnboarding({
   data,
   onUpdate,
@@ -42,22 +34,19 @@ export function StepOnboarding({
   const isValid = formData.fullName.trim() && formData.professionalTitle.trim();
 
   return (
-    <div className={`${shell} space-y-7 animate-in fade-in-50 duration-500`}>
+    <div className="space-y-8 animate-in fade-in-50 duration-500">
       <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-          Onboarding
-        </p>
-        <h2 className="text-balance text-3xl font-semibold tracking-tight">
-          Let’s start with the basics
+        <h2 className="text-3xl font-bold text-balance">
+          Let&apos;s start with the basics
         </h2>
-        <p className="text-sm leading-relaxed text-zinc-300">
-          Fill this once. Everything else is automated.
+        <p className="text-zinc-400 text-pretty">
+          Tell us about yourself to create your professional portfolio
         </p>
       </div>
 
-      <div className="space-y-5">
+      <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="fullName" className={label}>
+          <Label htmlFor="fullName" className="text-base">
             Full Name *
           </Label>
           <Input
@@ -65,12 +54,12 @@ export function StepOnboarding({
             placeholder="Jane Doe"
             value={formData.fullName}
             onChange={(e) => handleChange("fullName", e.target.value)}
-            className={inputBase}
+            className="h-12 text-base"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="professionalTitle" className={label}>
+          <Label htmlFor="professionalTitle" className="text-base">
             Professional Title *
           </Label>
           <Input
@@ -78,25 +67,25 @@ export function StepOnboarding({
             placeholder="Senior Product Designer"
             value={formData.professionalTitle}
             onChange={(e) => handleChange("professionalTitle", e.target.value)}
-            className={inputBase}
+            className="h-12 text-base"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="bio" className={label}>
+          <Label htmlFor="bio" className="text-base">
             Bio (Optional)
           </Label>
           <Textarea
             id="bio"
-            placeholder="Tell people what you do and what you're great at..."
+            placeholder="A brief description about yourself and what you do..."
             value={formData.bio}
             onChange={(e) => handleChange("bio", e.target.value)}
-            className={textAreaBase}
+            className="min-h-24 text-base resize-none"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="profileImage" className={label}>
+          <Label htmlFor="profileImage" className="text-base">
             Profile Image URL (Optional)
           </Label>
           <Input
@@ -104,7 +93,7 @@ export function StepOnboarding({
             placeholder="https://example.com/photo.jpg"
             value={formData.profileImage}
             onChange={(e) => handleChange("profileImage", e.target.value)}
-            className={inputBase}
+            className="h-12 text-base"
           />
         </div>
       </div>
@@ -112,7 +101,8 @@ export function StepOnboarding({
       <Button
         onClick={onNext}
         disabled={!isValid}
-        className="h-12 w-full rounded-2xl bg-white text-black hover:opacity-90"
+        className="w-full h-12 text-base"
+        size="lg"
       >
         Continue
       </Button>
