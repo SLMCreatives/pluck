@@ -8,11 +8,11 @@ import type {
   ContentBlock
 } from "@/types/portfolio";
 import { PhoneMockup } from "@/components/phone-mockup";
-import { StepOnboarding } from "@/components/wizard_old/step-onboarding";
-import { StepSocial } from "@/components/wizard_old/step-social";
-import { StepBlocks } from "@/components/wizard_old/step-blocks";
-import { BlockForm } from "@/components/wizard_old/block-forms";
-import { StepTabs } from "@/components/wizard_old/step-tabs";
+import { StepOnboarding } from "@/components/wizard/step-onboarding";
+import { StepSocial } from "@/components/wizard/step-social";
+import { StepBlocks } from "@/components/wizard/step-blocks";
+import { BlockForm } from "@/components/wizard/block-forms";
+import { StepTabs } from "@/components/wizard/step-tabs";
 import { PortfolioPreview } from "@/components/portfolio-preview";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
