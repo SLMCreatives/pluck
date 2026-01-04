@@ -8,12 +8,12 @@ import {
   Twitter,
   Globe,
   Mail,
-  ArrowUpRight,
-  Sparkles
+  ArrowUpRight
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface PortfolioPreviewProps {
   data: PortfolioData;
@@ -61,51 +61,46 @@ export function PortfolioPreview({ data, activeTab }: PortfolioPreviewProps) {
       {/* Top Profile */}
       <div className="mx-auto max-w-5xl px-6 pt-12 pb-8">
         <div className={`${shell} p-7 sm:p-10`}>
-          <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-5">
-              <Avatar className="h-16 w-16 ring-1 ring-white/10">
-                <AvatarImage
-                  src={
-                    data.profileImage ||
-                    "/placeholder.svg?height=96&width=96&query=professional+headshot"
-                  }
-                  alt={data.fullName}
-                />
-                <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-lime-600 text-white font-semibold">
-                  {data.fullName
-                    ?.split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase() || "UN"}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-balance">
-                    {data.fullName || "Your Name"}
-                  </h1>
-                  <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
-                    <Sparkles className="h-3.5 w-3.5 text-indigo-300" />
-                    Pluck Portfolio
-                  </span>
-                </div>
-
-                <p className="text-sm text-zinc-300">
-                  {data.professionalTitle || "Your Title"}
-                </p>
-
-                {data.bio && (
-                  <p className="mt-3 max-w-xl text-sm text-zinc-300 leading-relaxed text-pretty">
-                    {data.bio}
+          <div className="flex flex-col gap-8 items-center">
+            <div className=" flex flex-row  md:flex-col items-center justify-between gap-5">
+              <div className="flex gap-6">
+                <Avatar className="h-16 w-16 ring-1 ring-white/10">
+                  <AvatarImage
+                    src={
+                      data.profileImage ||
+                      "/placeholder.svg?height=96&width=96&query=professional+headshot"
+                    }
+                    alt={data.fullName}
+                  />
+                  <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-lime-600 text-white font-semibold">
+                    {data.fullName
+                      ?.split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase() || "UN"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-balance">
+                      {data.fullName || "Your Name"}
+                    </h1>
+                  </div>
+                  <p className="text-sm text-zinc-300">
+                    {data.professionalTitle || "Your Title"}
                   </p>
-                )}
+                  {data.bio && (
+                    <p className="mt-3 max-w-xl text-sm text-zinc-300 leading-relaxed text-pretty">
+                      {data.bio}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 sm:items-end">
+            <div className="flex md:flex-col gap-3 sm:items-end">
               {/* Primary Contact */}
-              <Button className="h-11 rounded-2xl bg-white text-black hover:opacity-90">
+              <Button className="h-11  rounded-full bg-white text-black hover:text-white">
                 Contact Me
                 <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>
@@ -281,9 +276,11 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
         <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
           <div className="flex gap-4">
             {block.image ? (
-              <img
+              <Image
                 src={block.image}
                 alt={block.company}
+                width={480}
+                height={480}
                 className="h-12 w-12 rounded-2xl object-cover border border-white/10 bg-white/5"
               />
             ) : (

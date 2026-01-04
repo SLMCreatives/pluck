@@ -112,7 +112,7 @@ export function StepOnboarding({
       <Button
         onClick={onNext}
         disabled={!isValid}
-        className="h-12 w-full rounded-2xl bg-white text-black hover:opacity-90"
+        className="h-12 w-full rounded-2xl bg-white text-black hover:bg-black hover:text-white"
       >
         Continue
       </Button>

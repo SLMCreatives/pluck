@@ -27,7 +27,7 @@ export function BlockForm({ type, onSave, onCancel }: BlockFormProps) {
 /** Shared styles */
 const shell =
   "rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]";
-const heading = "text-balance text-2xl font-semibold tracking-tight";
+const heading = "text-balance text-2xl font-semibold tracking-tight text-white";
 const sub = "text-sm leading-relaxed text-zinc-300";
 const fieldLabel =
   "text-xs font-semibold uppercase tracking-wider text-zinc-400";
@@ -100,7 +100,7 @@ function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
     <div className={`${shell} space-y-6 animate-in fade-in-50 duration-500`}>
       <TopHeader
         title="Add Gallery Images"
-        desc="Drop image links — we’ll make it look premium automatically."
+        desc="Drop image links — we'll make it look premium automatically."
       />
 
       <div className="space-y-4">

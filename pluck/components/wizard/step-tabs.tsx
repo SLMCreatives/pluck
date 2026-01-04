@@ -18,7 +18,7 @@ interface StepTabsProps {
 const shell =
   "rounded-3xl border border-white/10 bg-white/[0.03] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]";
 const inputBase =
-  "h-12 rounded-2xl border border-white/10 bg-black/30 text-white placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:ring-offset-0";
+  "h-12 rounded-2xl border border-white/10 bg-black/30 text-white dark:text-white placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:ring-offset-0";
 
 export function StepTabs({
   tabs,
@@ -111,7 +111,7 @@ export function StepTabs({
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <div className="flex flex-row md:flex-col gap-4 sm:flex-row sm:items-center -my-6">
                   <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
@@ -135,7 +135,9 @@ export function StepTabs({
                   </div>
 
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold">{tab.name}</h3>
+                    <h3 className="text-lg font-semibold text-white">
+                      {tab.name}
+                    </h3>
                     <p className="text-sm text-zinc-300">
                       {tab.blocks.length} block(s)
                     </p>
@@ -148,8 +150,8 @@ export function StepTabs({
                       onClick={() => onAddContent(tab.id)}
                       className="h-10 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white/10"
                     >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Content
+                      <Plus className="md:mr-2 h-4 w-4" />
+                      <span className="hidden md:block">Add Content</span>
                     </Button>
 
                     <Button
@@ -191,13 +193,13 @@ export function StepTabs({
         <Button
           variant="outline"
           onClick={onBack}
-          className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white/10"
+          className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white"
         >
           Back
         </Button>
         <Button
           onClick={onFinish}
-          className="h-12 flex-1 rounded-2xl bg-white text-black hover:opacity-90"
+          className="h-12 flex-1 rounded-2xl bg-white/90 text-black hover:bg-white hover:text-black"
         >
           View Portfolio
         </Button>

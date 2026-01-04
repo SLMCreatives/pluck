@@ -45,7 +45,7 @@ export function StepBlocks({ onSelectBlock, onBack }: StepBlocksProps) {
           Choose what to add
         </h2>
         <p className="text-sm leading-relaxed text-zinc-300">
-          Pick a block type. We’ll format it like a designer did it.
+          Pick a block type. We&apos;ll format it like a designer did it.
         </p>
       </div>
 
@@ -65,7 +65,9 @@ export function StepBlocks({ onSelectBlock, onBack }: StepBlocksProps) {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold">{block.title}</h3>
+                    <h3 className="font-semibold text-white text-lg">
+                      {block.title}
+                    </h3>
                     <p className="mt-1 text-sm text-zinc-300">
                       {block.description}
                     </p>

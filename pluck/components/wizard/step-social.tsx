@@ -132,13 +132,13 @@ export function StepSocial({
         <Button
           variant="outline"
           onClick={onBack}
-          className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white/10"
+          className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white"
         >
           Back
         </Button>
         <Button
           onClick={onNext}
-          className="h-12 flex-1 rounded-2xl bg-white text-black hover:opacity-90"
+          className="h-10 w-full border-white/15 rounded-2xl bg-white text-black hover:bg-black hover:text-white"
         >
           Continue
         </Button>

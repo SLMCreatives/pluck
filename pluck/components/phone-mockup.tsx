@@ -10,20 +10,20 @@ interface PhoneMockupProps {
 
 export function PhoneMockup({ data, activeTab }: PhoneMockupProps) {
   return (
-    <div className="hidden lg:flex items-center justify-center min-h-screen bg-black sticky top-0">
+    <div className="flex items-center justify-center min-h-screen  sticky top-0">
       {/* Ambient glow like landing page */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {/*  <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-[-140px] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl" />
         <div className="absolute right-[-180px] top-[160px] h-[520px] w-[520px] rounded-full bg-fuchsia-500/20 blur-3xl" />
         <div className="absolute left-[-160px] bottom-[-180px] h-[520px] w-[520px] rounded-full bg-emerald-500/15 blur-3xl" />
-      </div>
+      </div> */}
 
       <div className="relative z-10">
         {/* soft outer glow */}
         <div className="absolute -inset-6 -z-10 rounded-[3.5rem] bg-white/5 blur-2xl" />
 
         {/* Phone frame */}
-        <div className="relative w-[380px] h-[780px] rounded-[3.25rem] p-3 bg-black shadow-2xl ring-1 ring-white/10">
+        <div className="relative w-[450px] h-[780px] rounded-[3.25rem] p-3 bg-black shadow-2xl ring-1 ring-white/10">
           {/* Frame highlight */}
           <div className="absolute inset-0 rounded-[3.25rem] ring-1 ring-white/5 pointer-events-none" />
 

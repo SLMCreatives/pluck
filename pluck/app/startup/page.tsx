@@ -13,7 +13,7 @@ import { StepSocial } from "@/components/wizard/step-social";
 import { StepBlocks } from "@/components/wizard/step-blocks";
 import { BlockForm } from "@/components/wizard/block-forms";
 import { StepTabs } from "@/components/wizard/step-tabs";
-import { PortfolioPreview } from "@/components/portfolio-preview";
+//import { PortfolioPreview } from "@/components/portfolio-preview";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
@@ -133,17 +133,19 @@ export default function Home() {
               <p className="text-zinc-400">Preview your portfolio on mobile</p>
             </div>
 
-            <div className="flex justify-center">
-              <div className="border-2 rounded-2xl overflow-hidden bg-white">
-                <PortfolioPreview data={portfolioData} />
-              </div>
+            {/* <PortfolioPreview data={portfolioData} /> */}
+            <div className="flex items-center justify-center gap-2">
+              <PhoneMockup
+                data={portfolioData}
+                //activeTab={portfolioData.tabs[0]?.id}
+              />
             </div>
 
             <div className="flex gap-3">
               <Button
                 variant="outline"
                 onClick={() => setStep("tabs")}
-                className="flex-1 h-12"
+                className="flex-1 h-12 text-black"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Edit
