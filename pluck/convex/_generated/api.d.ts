@@ -8,8 +8,11 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
+import type * as billplz from "../billplz.js";
+import type * as http from "../http.js";
 import type * as profiles from "../profiles.js";
-import type * as tasks from "../tasks.js";
+import type * as stripe from "../stripe.js";
 
 import type {
   ApiFromModules,
@@ -18,8 +21,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
+  billplz: typeof billplz;
+  http: typeof http;
   profiles: typeof profiles;
-  tasks: typeof tasks;
+  stripe: typeof stripe;
 }>;
 
 /**

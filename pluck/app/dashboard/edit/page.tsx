@@ -1,16 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { useMutation, useAction, useQuery } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "@/convex/_generated/api";
-import type {
-  PortfolioData,
-  Tab,
-  BlockType,
-  ContentBlock
-} from "@/types/portfolio";
+import type { PortfolioData, Tab, BlockType, ContentBlock } from "@/types/portfolio";
 import { PhoneMockup } from "@/components/phone-mockup";
 import { StepOnboarding } from "@/components/wizard/step-onboarding";
 import { StepSocial } from "@/components/wizard/step-social";
@@ -21,28 +16,21 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 
-type WizardStep =
-  | "onboarding"
-  | "social"
-  | "tabs"
-  | "blocks"
-  | "block-form"
-  | "preview";
+type WizardStep = "onboarding" | "social" | "tabs" | "blocks" | "block-form" | "preview";
 
-export default function Home() {
-  const [step, setStep] = useState<WizardStep>("onboarding");
-  const [selectedBlockType, setSelectedBlockType] = useState<BlockType | null>(
-    null
-  );
-  const [currentTabId, setCurrentTabId] = useState<string | null>(null);
-  const [slug, setSlug] = useState("");
-  const [publishError, setPublishError] = useState<string | null>(null);
-  const [publishing, setPublishing] = useState(false);
-
-  const createCheckoutSession = useAction(api.stripe.createCheckoutSession);
+export default function EditProfilePage() {
+  const profile = useQuery(api.profiles.getMyProfile);
+  const updateProfile = useMutation(api.profiles.updateProfile);
   const { signOut } = useAuthActions();
   const router = useRouter();
-  const currentUser = useQuery(api.auth.currentUser);
+
+  const [ready, setReady] = useState(false);
+  const [step, setStep] = useState<WizardStep>("onboarding");
+  const [selectedBlockType, setSelectedBlockType] = useState<BlockType | null>(null);
+  const [currentTabId, setCurrentTabId] = useState<string | null>(null);
+  const [slug, setSlug] = useState("");
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const [portfolioData, setPortfolioData] = useState<PortfolioData>({
     fullName: "",
@@ -50,23 +38,48 @@ export default function Home() {
     bio: "",
     profileImage: "",
     socialLinks: [],
-    tabs: [{ id: "tab-1", name: "Work", blocks: [] }]
+    tabs: [{ id: "tab-1", name: "Work", blocks: [] }],
   });
 
-  const updateBasicInfo = (data: Partial<PortfolioData>) => {
-    setPortfolioData((prev) => ({ ...prev, ...data }));
-  };
+  useEffect(() => {
+    if (profile === null) {
+      router.replace("/startup");
+      return;
+    }
+    if (profile && !ready) {
+      setPortfolioData({
+        fullName: profile.fullName,
+        professionalTitle: profile.professionalTitle,
+        bio: profile.bio,
+        profileImage: profile.profileImage,
+        socialLinks: profile.socialLinks ?? [],
+        tabs: (profile.tabs ?? []) as PortfolioData["tabs"],
+      });
+      setSlug(profile.slug ?? "");
+      setReady(true);
+    }
+  }, [profile, ready, router]);
 
-  const updateTabs = (tabs: Tab[]) => {
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+      </div>
+    );
+  }
+
+  const updateBasicInfo = (data: Partial<PortfolioData>) =>
+    setPortfolioData((prev) => ({ ...prev, ...data }));
+
+  const updateTabs = (tabs: Tab[]) =>
     setPortfolioData((prev) => ({ ...prev, tabs }));
-  };
 
   const addBlockToTab = (tabId: string, block: ContentBlock) => {
     setPortfolioData((prev) => ({
       ...prev,
       tabs: prev.tabs.map((tab) =>
         tab.id === tabId ? { ...tab, blocks: [...tab.blocks, block] } : tab
-      )
+      ),
     }));
     setStep("tabs");
     setSelectedBlockType(null);
@@ -83,6 +96,19 @@ export default function Home() {
     setStep("blocks");
   };
 
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await updateProfile({ ...portfolioData, slug });
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const renderStep = () => {
     switch (step) {
       case "onboarding":
@@ -92,7 +118,7 @@ export default function Home() {
               fullName: portfolioData.fullName,
               professionalTitle: portfolioData.professionalTitle,
               bio: portfolioData.bio,
-              profileImage: portfolioData.profileImage
+              profileImage: portfolioData.profileImage,
             }}
             onUpdate={updateBasicInfo}
             onNext={() => setStep("social")}
@@ -141,8 +167,13 @@ export default function Home() {
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold">Your Portfolio is Ready!</h2>
-              <p className="text-zinc-400">Preview your portfolio, then publish for a one-time fee.</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                Review
+              </p>
+              <h2 className="text-3xl font-bold">Looking good!</h2>
+              <p className="text-zinc-400">
+                Review your profile, then save your changes.
+              </p>
             </div>
 
             <div className="flex items-center justify-center gap-2">
@@ -150,7 +181,7 @@ export default function Home() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="slug">Choose your username</Label>
+              <Label htmlFor="slug">Username</Label>
               <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2">
                 <span className="text-sm text-zinc-400">pluck.link/</span>
                 <input
@@ -158,21 +189,13 @@ export default function Home() {
                   value={slug}
                   onChange={(e) => {
                     setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
-                    setPublishError(null);
+                    setSaveError(null);
                   }}
                   placeholder="yourname"
                   className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-zinc-500"
                 />
               </div>
-              {publishError && (
-                <p className="text-sm text-red-400">{publishError}</p>
-              )}
-            </div>
-
-            <div className="flex items-center justify-center">
-              <span className="rounded-full bg-indigo-500/10 px-4 py-1.5 text-sm font-semibold text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
-                One-time payment · RM 10
-              </span>
+              {saveError && <p className="text-sm text-red-400">{saveError}</p>}
             </div>
 
             <div className="flex gap-3">
@@ -182,30 +205,14 @@ export default function Home() {
                 className="flex-1 h-12 text-black"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Edit
+                Back
               </Button>
               <Button
-                disabled={!slug || publishing}
-                onClick={async () => {
-                  setPublishing(true);
-                  setPublishError(null);
-                  try {
-                    const { checkoutUrl } = await createCheckoutSession({
-                      ...portfolioData,
-                      slug,
-                      email: (currentUser as { email?: string } | null)?.email ?? "",
-                    });
-                    window.location.href = checkoutUrl;
-                  } catch (err: unknown) {
-                    setPublishError(
-                      err instanceof Error ? err.message : "Something went wrong."
-                    );
-                    setPublishing(false);
-                  }
-                }}
+                disabled={!slug || saving}
+                onClick={handleSave}
                 className="flex-1 h-12"
               >
-                {publishing ? "Redirecting to payment…" : "Pay RM 10 & Publish"}
+                {saving ? "Saving…" : "Save Changes"}
               </Button>
             </div>
           </div>
@@ -220,28 +227,34 @@ export default function Home() {
     <div className="min-h-screen bg-zinc-950 text-white">
       <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
         <div className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold">P</span>
+          <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold">
+            P
+          </span>
           <span className="text-sm font-semibold">Pluck</span>
         </div>
-        <button
-          onClick={() => signOut()}
-          className="text-xs text-zinc-400 hover:text-white transition"
-        >
-          Sign out
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="text-xs text-zinc-400 transition hover:text-white"
+          >
+            ← Back to dashboard
+          </button>
+          <button
+            onClick={() => signOut()}
+            className="text-xs text-zinc-400 transition hover:text-white"
+          >
+            Sign out
+          </button>
+        </div>
       </header>
+
       <div className="lg:grid lg:grid-cols-2">
-        {/* Wizard Panel */}
         <div className="min-h-screen p-6 lg:p-12 flex items-center justify-center">
           <div className="w-full max-w-xl">{renderStep()}</div>
         </div>
 
-        {/* Preview Panel - Desktop Only */}
         {step !== "preview" && (
-          <PhoneMockup
-            data={portfolioData}
-            activeTab={portfolioData.tabs[0]?.id}
-          />
+          <PhoneMockup data={portfolioData} activeTab={portfolioData.tabs[0]?.id} />
         )}
       </div>
     </div>

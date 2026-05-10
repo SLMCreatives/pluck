@@ -5,8 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { ContentBlock } from "@/types/portfolio";
-import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Plus, X, UploadCloud, Loader2 } from "lucide-react";
+import { useUploadThing } from "@/lib/uploadthing";
 
 interface BlockFormProps {
   type: "gallery" | "video" | "experience";
@@ -78,93 +79,107 @@ function BottomActions({
 }
 
 function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
-  const [images, setImages] = useState([{ url: "", alt: "" }]);
+  const [images, setImages] = useState<{ url: string; alt: string }[]>([]);
+  const [uploading, setUploading] = useState(false);
 
-  const handleAdd = () => setImages([...images, { url: "", alt: "" }]);
-  const handleRemove = (index: number) =>
-    setImages(images.filter((_, i) => i !== index));
-  const handleChange = (index: number, field: "url" | "alt", value: string) => {
-    const updated = [...images];
-    updated[index][field] = value;
-    setImages(updated);
+  const { startUpload } = useUploadThing("galleryImage");
+
+  const handleFiles = useCallback(
+    async (files: FileList | null) => {
+      if (!files || files.length === 0) return;
+      setUploading(true);
+      try {
+        const res = await startUpload(Array.from(files));
+        if (res) {
+          const uploaded = res.map((f) => ({ url: f.ufsUrl, alt: "" }));
+          setImages((prev) => [...prev, ...uploaded]);
+        }
+      } finally {
+        setUploading(false);
+      }
+    },
+    [startUpload]
+  );
+
+  const handleAltChange = (index: number, value: string) => {
+    setImages((prev) =>
+      prev.map((img, i) => (i === index ? { ...img, alt: value } : img))
+    );
   };
+
+  const handleRemove = (index: number) =>
+    setImages((prev) => prev.filter((_, i) => i !== index));
 
   const handleSave = () => {
-    const valid = images.filter((i) => i.url.trim());
-    if (valid.length) onSave({ type: "gallery", images: valid });
+    if (images.length) onSave({ type: "gallery", images });
   };
-
-  const isValid = images.some((img) => img.url.trim());
 
   return (
     <div className={`${shell} space-y-6 animate-in fade-in-50 duration-500`}>
       <TopHeader
         title="Add Gallery Images"
-        desc="Drop image links — we'll make it look premium automatically."
+        desc="Upload photos from your device — we’ll make it look premium automatically."
       />
 
-      <div className="space-y-4">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className="rounded-3xl border border-white/10 bg-black/20 p-5"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex-1 space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor={`url-${index}`} className={fieldLabel}>
-                    Image URL *
-                  </Label>
-                  <Input
-                    id={`url-${index}`}
-                    placeholder="https://example.com/image.jpg"
-                    value={image.url}
-                    onChange={(e) => handleChange(index, "url", e.target.value)}
-                    className={inputBase}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`alt-${index}`} className={fieldLabel}>
-                    Description
-                  </Label>
-                  <Input
-                    id={`alt-${index}`}
-                    placeholder="What’s happening in this image?"
-                    value={image.alt}
-                    onChange={(e) => handleChange(index, "alt", e.target.value)}
-                    className={inputBase}
-                  />
-                </div>
-              </div>
+      {/* Drop zone */}
+      <label className="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-white/20 bg-white/[0.02] p-10 transition hover:border-white/40 hover:bg-white/[0.04]">
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          className="sr-only"
+          onChange={(e) => handleFiles(e.target.files)}
+          disabled={uploading}
+        />
+        {uploading ? (
+          <Loader2 className="h-7 w-7 animate-spin text-zinc-400" />
+        ) : (
+          <UploadCloud className="h-7 w-7 text-zinc-400 transition group-hover:text-white" />
+        )}
+        <div className="text-center">
+          <p className="text-sm font-semibold text-white/80">
+            {uploading ? "Uploading…" : "Click to upload images"}
+          </p>
+          <p className="text-xs text-zinc-500">PNG, JPG, WEBP up to 4 MB each</p>
+        </div>
+      </label>
 
-              {images.length > 1 && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleRemove(index)}
-                  className="mt-8 h-10 w-10 rounded-2xl bg-white/5 text-white/80 hover:bg-white/10"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
+      {/* Uploaded images */}
+      {images.length > 0 && (
+        <div className="space-y-3">
+          {images.map((image, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 p-3"
+            >
+              <img
+                src={image.url}
+                alt={image.alt}
+                className="h-14 w-14 rounded-xl object-cover border border-white/10 flex-shrink-0"
+              />
+              <Input
+                placeholder="Add a description…"
+                value={image.alt}
+                onChange={(e) => handleAltChange(index, e.target.value)}
+                className={`${inputBase} flex-1`}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleRemove(index)}
+                className="h-9 w-9 flex-shrink-0 rounded-xl bg-white/5 text-white/60 hover:bg-white/10"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
-          </div>
-        ))}
-
-        <Button
-          variant="outline"
-          onClick={handleAdd}
-          className="h-12 w-full rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white/10"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Another Image
-        </Button>
-      </div>
+          ))}
+        </div>
+      )}
 
       <BottomActions
         left={{ label: "Cancel", onClick: onCancel }}
         right={{ label: "Save Gallery", onClick: handleSave }}
-        disabled={!isValid}
+        disabled={images.length === 0 || uploading}
       />
     </div>
   );
@@ -233,6 +248,8 @@ function ExperienceForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
   const [period, setPeriod] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
+  const [logoUploading, setLogoUploading] = useState(false);
+  const { startUpload: startLogoUpload } = useUploadThing("companyLogo");
 
   const handleSave = () => {
     if (title.trim() && company.trim()) {
@@ -310,16 +327,43 @@ function ExperienceForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="expImage" className={fieldLabel}>
-            Company Logo URL (Optional)
-          </Label>
-          <Input
-            id="expImage"
-            placeholder="https://example.com/logo.png"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-            className={inputBase}
-          />
+          <Label className={fieldLabel}>Company Logo (Optional)</Label>
+          <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-white/20 bg-white/[0.02] p-4 transition hover:border-white/40">
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              disabled={logoUploading}
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setLogoUploading(true);
+                try {
+                  const res = await startLogoUpload([file]);
+                  if (res?.[0]) setImage(res[0].ufsUrl);
+                } finally {
+                  setLogoUploading(false);
+                }
+              }}
+            />
+            {image ? (
+              <img src={image} alt="logo" className="h-10 w-10 rounded-xl object-cover border border-white/10" />
+            ) : (
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/5">
+                {logoUploading ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
+                ) : (
+                  <UploadCloud className="h-4 w-4 text-zinc-400" />
+                )}
+              </div>
+            )}
+            <div>
+              <p className="text-sm text-white/80">
+                {logoUploading ? "Uploading…" : image ? "Click to replace" : "Upload logo"}
+              </p>
+              <p className="text-xs text-zinc-500">PNG, JPG up to 1 MB</p>
+            </div>
+          </label>
         </div>
       </div>
 

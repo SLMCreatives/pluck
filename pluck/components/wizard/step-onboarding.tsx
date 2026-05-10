@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { UploadCloud, Loader2 } from "lucide-react";
+import { useUploadThing } from "@/lib/uploadthing";
 
 interface StepOnboardingProps {
   data: {
@@ -32,6 +34,8 @@ export function StepOnboarding({
   onNext
 }: StepOnboardingProps) {
   const [formData, setFormData] = useState(data);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const { startUpload } = useUploadThing("profileImage");
 
   const handleChange = (field: string, value: string) => {
     const updated = { ...formData, [field]: value };
@@ -96,16 +100,47 @@ export function StepOnboarding({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="profileImage" className={label}>
-            Profile Image URL (Optional)
-          </Label>
-          <Input
-            id="profileImage"
-            placeholder="https://example.com/photo.jpg"
-            value={formData.profileImage}
-            onChange={(e) => handleChange("profileImage", e.target.value)}
-            className={inputBase}
-          />
+          <Label className={label}>Profile Photo (Optional)</Label>
+          <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-white/20 bg-white/[0.02] p-4 transition hover:border-white/40">
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              disabled={avatarUploading}
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setAvatarUploading(true);
+                try {
+                  const res = await startUpload([file]);
+                  if (res?.[0]) handleChange("profileImage", res[0].ufsUrl);
+                } finally {
+                  setAvatarUploading(false);
+                }
+              }}
+            />
+            {formData.profileImage ? (
+              <img
+                src={formData.profileImage}
+                alt="Profile"
+                className="h-14 w-14 rounded-2xl object-cover border border-white/10 flex-shrink-0"
+              />
+            ) : (
+              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/5 flex-shrink-0">
+                {avatarUploading ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
+                ) : (
+                  <UploadCloud className="h-5 w-5 text-zinc-400" />
+                )}
+              </div>
+            )}
+            <div>
+              <p className="text-sm text-white/80">
+                {avatarUploading ? "Uploading…" : formData.profileImage ? "Click to replace" : "Upload a photo"}
+              </p>
+              <p className="text-xs text-zinc-500">PNG, JPG up to 2 MB</p>
+            </div>
+          </label>
         </div>
       </div>
 

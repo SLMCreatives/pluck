@@ -3,7 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ["encrypted-tbn0.gstatic.com"]
+    remotePatterns: [
+      { hostname: "encrypted-tbn0.gstatic.com" },
+      { hostname: "*.ufs.sh" },
+    ],
   }
 };
 
