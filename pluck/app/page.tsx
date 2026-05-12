@@ -3,6 +3,7 @@
 // ============================================================
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { MockupHero } from "@/components/mockup-hero";
 
 const features = [
   {
@@ -166,7 +167,7 @@ export default function Page() {
           </div>
 
           <div className="relative">
-            <MockupCard />
+            <MockupHero />
           </div>
         </div>
       </section>
@@ -558,57 +559,3 @@ function Glow() {
   );
 }
 
-function MockupCard() {
-  return (
-    <div className="relative">
-      <div className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-white/5 blur-2xl" />
-      <div className="overflow-hidden rounded-[2.25rem] border border-white/10 bg-black/30 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-5 py-4">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-red-400/60" />
-            <span className="h-3 w-3 rounded-full bg-yellow-400/60" />
-            <span className="h-3 w-3 rounded-full bg-green-400/60" />
-          </div>
-          <div className="text-xs text-zinc-400">pluck.link/yourname</div>
-          <div className="w-10" />
-        </div>
-
-        <div className="grid gap-4 p-6 sm:p-7">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-white/10" />
-            <div className="space-y-1">
-              <div className="h-3 w-32 rounded bg-white/10" />
-              <div className="h-3 w-44 rounded bg-white/5" />
-            </div>
-          </div>
-
-          <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-            <div className="flex items-center justify-between">
-              <div className="h-3 w-28 rounded bg-white/10" />
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-zinc-300">
-                Contact Me
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="aspect-square rounded-2xl bg-white/5" />
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-            <div className="flex items-center justify-between">
-              <div className="h-3 w-24 rounded bg-white/10" />
-              <div className="h-3 w-10 rounded bg-white/5" />
-            </div>
-            <div className="h-36 rounded-2xl bg-white/5" />
-          </div>
-
-          <p className="text-xs text-zinc-400">
-            Preview updates instantly on mobile & desktop.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
