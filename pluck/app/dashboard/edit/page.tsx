@@ -13,10 +13,14 @@ import { StepBlocks } from "@/components/wizard/step-blocks";
 import { BlockForm } from "@/components/wizard/block-forms";
 import { StepTabs } from "@/components/wizard/step-tabs";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { ArrowLeft } from "lucide-react";
+import { LogOut, Check, ArrowLeft } from "lucide-react";
 
 type WizardStep = "onboarding" | "social" | "tabs" | "blocks" | "block-form" | "preview";
+
+const STEP_LABELS = ["Profile", "Socials", "Content", "Preview"];
+const STEP_INDEX: Record<WizardStep, number> = {
+  onboarding: 0, social: 1, tabs: 2, blocks: 2, "block-form": 2, preview: 3,
+};
 
 export default function EditProfilePage() {
   const profile = useQuery(api.profiles.getMyProfile);
@@ -37,21 +41,22 @@ export default function EditProfilePage() {
     professionalTitle: "",
     bio: "",
     profileImage: "",
+    phone: "",
+    showPhone: false,
     socialLinks: [],
     tabs: [{ id: "tab-1", name: "Work", blocks: [] }],
   });
 
   useEffect(() => {
-    if (profile === null) {
-      router.replace("/startup");
-      return;
-    }
+    if (profile === null) { router.replace("/startup"); return; }
     if (profile && !ready) {
       setPortfolioData({
         fullName: profile.fullName,
         professionalTitle: profile.professionalTitle,
         bio: profile.bio,
         profileImage: profile.profileImage,
+        phone: profile.phone ?? "",
+        showPhone: profile.showPhone ?? false,
         socialLinks: profile.socialLinks ?? [],
         tabs: (profile.tabs ?? []) as PortfolioData["tabs"],
       });
@@ -63,7 +68,7 @@ export default function EditProfilePage() {
   if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+        <div className="h-7 w-7 animate-spin rounded-full border-2 border-white/20 border-t-white" />
       </div>
     );
   }
@@ -73,6 +78,17 @@ export default function EditProfilePage() {
 
   const updateTabs = (tabs: Tab[]) =>
     setPortfolioData((prev) => ({ ...prev, tabs }));
+
+  const deleteBlockFromTab = (tabId: string, blockIndex: number) => {
+    setPortfolioData((prev) => ({
+      ...prev,
+      tabs: prev.tabs.map((tab) =>
+        tab.id === tabId
+          ? { ...tab, blocks: tab.blocks.filter((_, i) => i !== blockIndex) }
+          : tab
+      ),
+    }));
+  };
 
   const addBlockToTab = (tabId: string, block: ContentBlock) => {
     setPortfolioData((prev) => ({
@@ -84,16 +100,6 @@ export default function EditProfilePage() {
     setStep("tabs");
     setSelectedBlockType(null);
     setCurrentTabId(null);
-  };
-
-  const handleSelectBlock = (type: BlockType) => {
-    setSelectedBlockType(type);
-    setStep("block-form");
-  };
-
-  const handleAddContent = (tabId: string) => {
-    setCurrentTabId(tabId);
-    setStep("blocks");
   };
 
   const handleSave = async () => {
@@ -114,46 +120,41 @@ export default function EditProfilePage() {
       case "onboarding":
         return (
           <StepOnboarding
-            data={{
-              fullName: portfolioData.fullName,
-              professionalTitle: portfolioData.professionalTitle,
-              bio: portfolioData.bio,
-              profileImage: portfolioData.profileImage,
-            }}
+            data={{ fullName: portfolioData.fullName, professionalTitle: portfolioData.professionalTitle, bio: portfolioData.bio, profileImage: portfolioData.profileImage }}
             onUpdate={updateBasicInfo}
             onNext={() => setStep("social")}
           />
         );
-
       case "social":
         return (
           <StepSocial
             data={portfolioData.socialLinks}
+            phone={portfolioData.phone}
+            showPhone={portfolioData.showPhone}
             onUpdate={(links) => updateBasicInfo({ socialLinks: links })}
+            onUpdatePhone={(phone, showPhone) => updateBasicInfo({ phone, showPhone })}
             onNext={() => setStep("tabs")}
             onBack={() => setStep("onboarding")}
           />
         );
-
       case "tabs":
         return (
           <StepTabs
             tabs={portfolioData.tabs}
             onUpdate={updateTabs}
-            onAddContent={handleAddContent}
+            onAddContent={(tabId) => { setCurrentTabId(tabId); setStep("blocks"); }}
+            onDeleteBlock={deleteBlockFromTab}
             onBack={() => setStep("social")}
             onFinish={() => setStep("preview")}
           />
         );
-
       case "blocks":
         return (
           <StepBlocks
-            onSelectBlock={handleSelectBlock}
+            onSelectBlock={(type) => { setSelectedBlockType(type); setStep("block-form"); }}
             onBack={() => setStep("tabs")}
           />
         );
-
       case "block-form":
         return selectedBlockType && currentTabId ? (
           <BlockForm
@@ -162,37 +163,36 @@ export default function EditProfilePage() {
             onCancel={() => setStep("tabs")}
           />
         ) : null;
-
       case "preview":
         return (
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                Review
+          <div className="space-y-8 animate-in fade-in-50 duration-300">
+            <div className="space-y-1.5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                Step 4 of 4
               </p>
-              <h2 className="text-3xl font-bold">Looking good!</h2>
-              <p className="text-zinc-400">
-                Review your profile, then save your changes.
+              <h2 className="text-2xl font-bold tracking-tight">Looking good!</h2>
+              <p className="text-sm text-zinc-400">
+                Review your changes, update your username if needed, then save.
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-2">
-              <PhoneMockup data={portfolioData} />
-            </div>
-
+            {/* Username */}
             <div className="space-y-2">
-              <Label htmlFor="slug">Username</Label>
-              <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2">
-                <span className="text-sm text-zinc-400">pluck.link/</span>
+              <label className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                Username
+              </label>
+              <div className="flex h-11 items-center gap-0 overflow-hidden rounded-xl border border-white/10 bg-white/5 focus-within:border-white/30 transition-colors">
+                <span className="shrink-0 border-r border-white/10 bg-white/3 px-3 text-sm text-zinc-500">
+                  pluck.link/
+                </span>
                 <input
-                  id="slug"
                   value={slug}
                   onChange={(e) => {
                     setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
                     setSaveError(null);
                   }}
                   placeholder="yourname"
-                  className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-zinc-500"
+                  className="flex-1 bg-transparent px-3 text-sm text-white outline-none placeholder:text-zinc-600"
                 />
               </div>
               {saveError && <p className="text-sm text-red-400">{saveError}</p>}
@@ -200,61 +200,89 @@ export default function EditProfilePage() {
 
             <div className="flex gap-3">
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={() => setStep("tabs")}
-                className="flex-1 h-12 text-black"
+                className="h-11 gap-2 rounded-2xl text-zinc-400 hover:text-white"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="h-4 w-4" />
                 Back
               </Button>
               <Button
                 disabled={!slug || saving}
                 onClick={handleSave}
-                className="flex-1 h-12"
+                className="h-11 flex-1 rounded-2xl bg-white text-black hover:opacity-90"
               >
                 {saving ? "Saving…" : "Save Changes"}
               </Button>
             </div>
           </div>
         );
-
-      default:
-        return null;
     }
   };
 
+  const currentStepIndex = STEP_INDEX[step];
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+      {/* Header */}
+      <header className="flex items-center justify-between border-b border-white/8 px-6 py-4">
         <div className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold">
-            P
-          </span>
+          <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/10 text-xs font-bold">P</span>
           <span className="text-sm font-semibold">Pluck</span>
         </div>
+
+        {/* Step progress — desktop */}
+        <div className="hidden items-center gap-1 sm:flex">
+          {STEP_LABELS.map((label, i) => {
+            const done = i < currentStepIndex;
+            const active = i === currentStepIndex;
+            return (
+              <div key={label} className="flex items-center gap-1">
+                <div className={[
+                  "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-colors",
+                  done ? "bg-emerald-500 text-black" : active ? "bg-white text-black" : "bg-white/10 text-zinc-500",
+                ].join(" ")}>
+                  {done ? <Check className="h-3 w-3" /> : i + 1}
+                </div>
+                <span className={["text-xs font-medium transition-colors", active ? "text-white" : "text-zinc-600"].join(" ")}>
+                  {label}
+                </span>
+                {i < STEP_LABELS.length - 1 && (
+                  <div className={["mx-1 h-px w-6 transition-colors", done ? "bg-emerald-500/50" : "bg-white/10"].join(" ")} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push("/dashboard")}
-            className="text-xs text-zinc-400 transition hover:text-white"
+            className="text-xs text-zinc-500 transition hover:text-white"
           >
-            ← Back to dashboard
+            ← Dashboard
           </button>
           <button
             onClick={() => signOut()}
-            className="text-xs text-zinc-400 transition hover:text-white"
+            className="flex items-center gap-1.5 text-xs text-zinc-500 transition hover:text-white"
           >
+            <LogOut className="h-3.5 w-3.5" />
             Sign out
           </button>
         </div>
       </header>
 
-      <div className="lg:grid lg:grid-cols-2">
-        <div className="min-h-screen p-6 lg:p-12 flex items-center justify-center">
-          <div className="w-full max-w-xl">{renderStep()}</div>
+      <div className="lg:grid lg:grid-cols-2 lg:min-h-[calc(100vh-57px)]">
+        {/* Wizard panel */}
+        <div className="flex items-start justify-center p-6 pt-10 lg:p-16">
+          <div className="w-full max-w-lg">{renderStep()}</div>
         </div>
 
-        {step !== "preview" && (
-          <PhoneMockup data={portfolioData} activeTab={portfolioData.tabs[0]?.id} />
+        {/* Live preview — desktop */}
+        {step !== "blocks" && step !== "block-form" && (
+          <div className="hidden lg:flex lg:items-center lg:justify-center lg:border-l lg:border-white/8 lg:bg-white/1">
+            <PhoneMockup data={portfolioData} activeTab={portfolioData.tabs[0]?.id} />
+          </div>
         )}
       </div>
     </div>

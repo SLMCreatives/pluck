@@ -5,27 +5,45 @@ import type { PortfolioData, ContentBlock } from "@/types/portfolio";
 import {
   Instagram,
   Linkedin,
-  Twitter,
   Globe,
+  X,
   Mail,
-  ArrowUpRight
+  Phone,
+  MessageCircle,
+  ArrowUpRight,
+  Youtube,
+  Github
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 interface PortfolioPreviewProps {
   data: PortfolioData;
   activeTab?: string;
 }
 
-const shell =
-  "rounded-3xl border border-white/10 bg-white/[0.03] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]";
-const softCard = "rounded-3xl border border-white/10 bg-white/[0.02]";
-const inputChip =
-  "inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/90 hover:bg-white/10 transition";
-//const muted = "text-sm text-zinc-300 leading-relaxed";
+const SOCIAL_ICONS: Record<string, any> = {
+  instagram: Instagram,
+  linkedin: Linkedin,
+  twitter: X,
+  website: Globe,
+  email: Mail,
+  whatsapp: MessageCircle,
+  youtube: Youtube,
+  github: Github,
+  tiktok: X,
+  behance: Globe,
+  dribbble: Globe
+};
+
+function contactIcon(href: string) {
+  if (href.startsWith("tel:")) return Phone;
+  if (href.includes("wa.me")) return MessageCircle;
+  if (href.startsWith("mailto:")) return Mail;
+  return ArrowUpRight;
+}
 
 export function PortfolioPreview({ data, activeTab }: PortfolioPreviewProps) {
   const initialTab = activeTab || data.tabs[0]?.id;
@@ -38,282 +56,327 @@ export function PortfolioPreview({ data, activeTab }: PortfolioPreviewProps) {
     [data.socialLinks]
   );
 
-  const getSocialIcon = (platform: string) => {
-    const icons: Record<string, any> = {
-      instagram: Instagram,
-      linkedin: Linkedin,
-      twitter: Twitter,
-      website: Globe,
-      email: Mail
-    };
-    return icons[platform?.toLowerCase()] || Globe;
-  };
+  const contactHref = useMemo(() => {
+    if (data.showPhone && data.phone) {
+      const digits = data.phone.replace(/\D/g, "");
+      return `tel:+${digits}`;
+    }
+    const whatsapp = socials.find(
+      (s) => s.platform?.toLowerCase() === "whatsapp"
+    );
+    if (whatsapp) {
+      const digits = whatsapp.url.replace(/\D/g, "");
+      return `https://wa.me/${digits}`;
+    }
+    const email = socials.find((s) => s.platform?.toLowerCase() === "email");
+    if (email) return `mailto:${email.url}`;
+    return socials[0]?.url ?? null;
+  }, [data.showPhone, data.phone, socials]);
+
+  const initials =
+    data.fullName
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "??";
 
   return (
-    <div className="min-h-full bg-black text-white">
-      {/* Ambient Glow */}
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
+      {/* ── Ambient background ── */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-1/2 top-[-120px] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl" />
-        <div className="absolute right-[-160px] top-[160px] h-[520px] w-[520px] rounded-full bg-fuchsia-500/20 blur-3xl" />
-        <div className="absolute left-[-160px] bottom-[-120px] h-[520px] w-[520px] rounded-full bg-emerald-500/15 blur-3xl" />
+        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/4 rounded-full bg-indigo-600/20 blur-[120px]" />
+        <div className="absolute right-[-10%] top-[30%] h-[400px] w-[400px] rounded-full bg-fuchsia-600/15 blur-[100px]" />
+        <div className="absolute left-[-10%] bottom-[10%] h-[400px] w-[400px] rounded-full bg-emerald-600/10 blur-[100px]" />
       </div>
 
-      {/* Top Profile */}
-      <div className="mx-auto max-w-5xl px-6 pt-12 pb-8">
-        <div className={`${shell} p-7 sm:p-10`}>
-          <div className="flex flex-col gap-8 items-center">
-            <div className=" flex flex-row  md:flex-col items-center justify-between gap-5">
-              <div className="flex gap-6">
-                <Avatar className="h-16 w-16 ring-1 ring-white/10">
-                  <AvatarImage
-                    src={
-                      data.profileImage ||
-                      "/placeholder.svg?height=96&width=96&query=professional+headshot"
-                    }
-                    alt={data.fullName}
-                  />
-                  <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-lime-600 text-white font-semibold">
-                    {data.fullName
-                      ?.split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase() || "UN"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-balance">
-                      {data.fullName || "Your Name"}
-                    </h1>
-                  </div>
-                  <p className="text-sm text-zinc-300">
-                    {data.professionalTitle || "Your Title"}
-                  </p>
-                  {data.bio && (
-                    <p className="mt-3 max-w-xl text-sm text-zinc-300 leading-relaxed text-pretty">
-                      {data.bio}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex md:flex-col gap-3 sm:items-end">
-              {/* Primary Contact */}
-              <Button className="h-11  rounded-full bg-white text-black hover:text-white">
-                Contact Me
-                <ArrowUpRight className="ml-2 h-4 w-4" />
-              </Button>
-
-              {/* Social Chips */}
-              {socials.length > 0 && (
-                <div className="flex flex-wrap gap-2 sm:justify-end">
-                  {socials.map((link, idx) => {
-                    const Icon = getSocialIcon(link.platform);
-                    return (
-                      <a
-                        key={idx}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={inputChip}
-                      >
-                        <Icon className="h-4 w-4 text-white/80" />
-                        <span className="capitalize">{link.platform}</span>
-                      </a>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+      {/* ── Hero ── */}
+      <div className="mx-auto max-w-2xl px-5 pb-0 pt-16 sm:pt-20">
+        <div className="flex flex-col items-center text-center">
+          {/* Avatar */}
+          <div className="relative mb-6">
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-indigo-500/40 via-fuchsia-500/30 to-emerald-500/20 blur-md" />
+            <Avatar className="relative h-24 w-24 ring-2 ring-white/10 sm:h-28 sm:w-28">
+              <AvatarImage
+                src={data.profileImage || ""}
+                alt={data.fullName}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-fuchsia-600 text-xl font-bold text-white">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
           </div>
 
-          {/* Tab Navigation */}
-          {data.tabs.length > 0 && (
-            <div className="mt-8 border-t border-white/10 pt-5">
-              <div className="relative overflow-x-auto scrollbar-hide">
-                <div className="flex min-w-max items-center gap-2">
-                  {data.tabs.map((tab) => {
-                    const active = tab.id === selectedTabId;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setSelectedTabId(tab.id)}
-                        className={[
-                          "relative rounded-full px-4 py-2 text-sm font-semibold transition",
-                          active
-                            ? "bg-white text-black"
-                            : "bg-white/5 text-white/80 hover:bg-white/10"
-                        ].join(" ")}
-                      >
-                        {tab.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+          {/* Name + title */}
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            {data.fullName || "Your Name"}
+          </h1>
+          <p className="mt-2 text-base font-medium text-zinc-400">
+            {data.professionalTitle || "Professional Title"}
+          </p>
 
-              {/* Micro text */}
-              <p className="mt-3 text-xs text-zinc-400">
-                Tip: Tap a tab to explore — everything stays clean &
-                mobile-first.
-              </p>
-            </div>
+          {/* Bio */}
+          {data.bio && (
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-zinc-400">
+              {data.bio}
+            </p>
           )}
+
+          {/* CTA row */}
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            {contactHref
+              ? (() => {
+                  const Icon = contactIcon(contactHref);
+                  const isNative =
+                    contactHref.startsWith("tel:") ||
+                    contactHref.startsWith("mailto:");
+                  return (
+                    <a
+                      href={contactHref}
+                      target={isNative ? "_self" : "_blank"}
+                      rel="noopener noreferrer"
+                      className="group inline-flex h-10 items-center gap-2.5 rounded-full bg-white px-7 text-sm font-bold text-black shadow-[0_0_28px_rgba(255,255,255,0.15)] transition-all duration-200 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] active:scale-95"
+                    >
+                      <Icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                      Contact Me
+                    </a>
+                  );
+                })()
+              : null}
+
+            {/* Social icon chips */}
+            {socials
+              .filter(
+                (s) => s.platform?.toLowerCase() !== "whatsapp" || !contactHref
+              )
+              .map((link, idx) => {
+                const Icon =
+                  SOCIAL_ICONS[link.platform?.toLowerCase()] ?? Globe;
+                return (
+                  <a
+                    key={idx}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={link.platform}
+                    className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/5 text-zinc-400 transition hover:border-white/20 hover:bg-white/10 hover:text-white active:scale-95"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                );
+              })}
+          </div>
         </div>
+
+        {/* ── Tab navigation ── */}
+        {data.tabs.length > 1 && (
+          <div className="mt-12 flex items-center gap-1 overflow-x-auto border-b border-white/10 pb-px scrollbar-hide">
+            {data.tabs.map((tab) => {
+              const active = tab.id === selectedTabId;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedTabId(tab.id)}
+                  className={[
+                    "relative shrink-0 px-4 pb-3 pt-1 text-sm font-semibold transition-colors",
+                    active ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+                  ].join(" ")}
+                >
+                  {tab.name}
+                  {active && (
+                    <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-white" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Content Area */}
-      <div className="mx-auto max-w-5xl px-6 pb-16">
-        <div className="grid gap-6">
-          {currentTab?.blocks?.map((block, idx) => (
-            <BlockRenderer key={idx} block={block} />
-          ))}
-
-          {(!currentTab || currentTab.blocks.length === 0) && (
-            <div className={`${softCard} p-10 text-center`}>
-              <p className="text-sm text-zinc-300">No content added yet.</p>
-              <p className="mt-2 text-xs text-zinc-500">
-                Add a gallery, video, or experience block to make this page come
-                alive.
-              </p>
+      {/* ── Content ── */}
+      <div className="mx-auto max-w-2xl px-5 py-10">
+        {!currentTab || currentTab.blocks.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-20 text-center">
+            <div className="grid h-14 w-14 place-items-center rounded-3xl border border-white/10 bg-white/5 text-2xl">
+              🎨
             </div>
-          )}
+            <p className="text-sm text-zinc-500">No content here yet.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-10">
+            {currentTab.blocks.map((block, idx) => (
+              <BlockRenderer key={idx} block={block} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Footer ── */}
+      <div className="mx-auto max-w-2xl px-5 pb-10">
+        <div className="flex items-center justify-center gap-2 border-t border-white/5 pt-8">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs text-zinc-600 transition hover:text-zinc-400"
+          >
+            <span className="grid h-5 w-5 place-items-center rounded-lg bg-white/10 text-[10px] font-bold text-white">
+              P
+            </span>
+            Built with Pluck
+          </Link>
         </div>
       </div>
     </div>
   );
 }
 
-/** ---------------------------
- *  Block Renderer (Redesigned)
- *  --------------------------- */
+/* ─────────────────────────────────────────
+   Block Renderers
+───────────────────────────────────────── */
+
 function BlockRenderer({ block }: { block: ContentBlock }) {
-  if (block.type === "gallery") {
-    return (
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white/90">Gallery</h3>
-          <p className="text-xs text-zinc-400">{block.images.length} items</p>
-        </div>
+  if (block.type === "gallery") return <GalleryBlock block={block} />;
+  if (block.type === "video") return <VideoBlock block={block} />;
+  if (block.type === "experience") return <ExperienceBlock block={block} />;
+  return null;
+}
 
-        <div className="columns-2 gap-4 sm:columns-3">
-          {block.images.map((img, idx) => (
-            <div key={idx} className="mb-4 break-inside-avoid">
-              <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
-                <img
-                  src={
-                    img.url ||
-                    `/placeholder.svg?height=600&width=500&query=portfolio+image+${idx}`
-                  }
-                  alt={img.alt}
-                  className="w-full object-cover transition duration-500 group-hover:scale-[1.02]"
-                />
-
-                {/* hover overlay */}
-                <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                  {img.alt && (
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <p className="text-xs font-semibold text-white/90 line-clamp-2">
-                        {img.alt}
-                      </p>
-                    </div>
-                  )}
+function GalleryBlock({
+  block
+}: {
+  block: Extract<ContentBlock, { type: "gallery" }>;
+}) {
+  if (!block.images.length) return null;
+  return (
+    <section className="space-y-4">
+      <SectionLabel>
+        {block.images.length === 1
+          ? "Image"
+          : `Gallery · ${block.images.length} items`}
+      </SectionLabel>
+      <div className="columns-2 gap-3 sm:columns-2">
+        {block.images.map((img, idx) => (
+          <div key={idx} className="mb-3 break-inside-avoid">
+            <div className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/3">
+              <img
+                src={img.url || `/placeholder.svg?height=600&width=500`}
+                alt={img.alt || ""}
+                className="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+              />
+              {img.alt && (
+                <div className="absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-black/80 to-transparent px-3 pb-3 pt-6 transition duration-300 group-hover:translate-y-0">
+                  <p className="text-xs font-medium text-white/90 line-clamp-2">
+                    {img.alt}
+                  </p>
                 </div>
-              </div>
+              )}
             </div>
-          ))}
-        </div>
-      </section>
-    );
-  }
-
-  if (block.type === "video") {
-    const getEmbedUrl = (url: string) => {
-      if (!url) return url;
-      if (url.includes("youtube.com") || url.includes("youtu.be")) {
-        const videoId = url.includes("youtu.be")
-          ? url.split("youtu.be/")[1]?.split("?")[0]
-          : url.split("v=")[1]?.split("&")[0];
-        return `https://www.youtube.com/embed/${videoId}`;
-      }
-      if (url.includes("vimeo.com")) {
-        const videoId = url.split("vimeo.com/")[1]?.split("?")[0];
-        return `https://player.vimeo.com/video/${videoId}`;
-      }
-      return url;
-    };
-
-    return (
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white/90">
-            {block.title || "Featured Video"}
-          </h3>
-          <span className="text-xs text-zinc-400">Video</span>
-        </div>
-
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
-          <div className="aspect-video">
-            <iframe
-              src={getEmbedUrl(block.url)}
-              className="h-full w-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
           </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function VideoBlock({
+  block
+}: {
+  block: Extract<ContentBlock, { type: "video" }>;
+}) {
+  const embedUrl = getEmbedUrl(block.url);
+  return (
+    <section className="space-y-4">
+      <SectionLabel>Video</SectionLabel>
+      <div className="overflow-hidden rounded-2xl border border-white/8 bg-white/3">
+        {block.title && (
+          <div className="border-b border-white/8 px-5 py-3">
+            <p className="text-sm font-semibold">{block.title}</p>
+          </div>
+        )}
+        <div className="aspect-video">
+          <iframe
+            src={embedUrl}
+            className="h-full w-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
         </div>
-      </section>
-    );
-  }
+      </div>
+    </section>
+  );
+}
 
-  if (block.type === "experience") {
-    return (
-      <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-white/90">Experience</h3>
-
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-          <div className="flex gap-4">
+function ExperienceBlock({
+  block
+}: {
+  block: Extract<ContentBlock, { type: "experience" }>;
+}) {
+  return (
+    <section className="space-y-4">
+      <SectionLabel>Experience</SectionLabel>
+      <div className="rounded-2xl border border-white/8 bg-white/3 p-5">
+        <div className="flex gap-4">
+          {/* Logo */}
+          <div className="shrink-0">
             {block.image ? (
               <Image
                 src={block.image}
                 alt={block.company}
-                width={480}
-                height={480}
-                className="h-12 w-12 rounded-2xl object-cover border border-white/10 bg-white/5"
+                width={48}
+                height={48}
+                className="h-12 w-12 rounded-xl border border-white/10 object-cover"
               />
             ) : (
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/5 text-xs text-zinc-300 border border-white/10">
-                {block.company?.slice(0, 2)?.toUpperCase() || "EX"}
+              <div className="grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-white/5 text-sm font-bold text-zinc-300">
+                {block.company?.slice(0, 2).toUpperCase() || "CO"}
               </div>
             )}
+          </div>
 
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <h4 className="text-base font-semibold">{block.title}</h4>
-                  <p className="text-sm text-zinc-300">{block.company}</p>
-                </div>
-
-                {block.period && (
-                  <p className="text-xs text-zinc-400 sm:text-right">
-                    {block.period}
-                  </p>
-                )}
+          {/* Content */}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-semibold leading-tight">{block.title}</p>
+                <p className="mt-0.5 text-sm text-zinc-400">{block.company}</p>
               </div>
-
-              {block.description && (
-                <p className="mt-3 text-sm leading-relaxed text-zinc-300 text-pretty">
-                  {block.description}
-                </p>
+              {block.period && (
+                <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-zinc-400">
+                  {block.period}
+                </span>
               )}
             </div>
+            {block.description && (
+              <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+                {block.description}
+              </p>
+            )}
           </div>
         </div>
-      </section>
-    );
-  }
+      </div>
+    </section>
+  );
+}
 
-  return null;
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-xs font-semibold uppercase tracking-widest text-zinc-600">
+      {children}
+    </p>
+  );
+}
+
+function getEmbedUrl(url: string): string {
+  if (!url) return url;
+  if (url.includes("youtube.com") || url.includes("youtu.be")) {
+    const videoId = url.includes("youtu.be")
+      ? url.split("youtu.be/")[1]?.split("?")[0]
+      : url.split("v=")[1]?.split("&")[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (url.includes("vimeo.com")) {
+    const videoId = url.split("vimeo.com/")[1]?.split("?")[0];
+    return `https://player.vimeo.com/video/${videoId}`;
+  }
+  return url;
 }

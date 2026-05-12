@@ -1,48 +1,37 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
-import { api } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
-export const createCheckoutSession = action({
+export const createSubscriptionCheckout = action({
   args: {
+    profileId: v.id("profiles"),
+    tier: v.union(v.literal("publish"), v.literal("pro")),
     email: v.string(),
-    fullName: v.string(),
-    professionalTitle: v.string(),
-    bio: v.string(),
-    profileImage: v.string(),
-    socialLinks: v.array(v.object({ platform: v.string(), url: v.string() })),
-    tabs: v.array(v.object({ id: v.string(), name: v.string(), blocks: v.array(v.any()) })),
-    slug: v.string(),
   },
-  handler: async (ctx, { email, slug, fullName, ...rest }): Promise<{ checkoutUrl: string }> => {
+  handler: async (_ctx, { profileId, tier, email }): Promise<{ checkoutUrl: string }> => {
     const secretKey = process.env.STRIPE_SECRET_KEY;
     const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
-    const convexSiteUrl = process.env.CONVEX_SITE_URL;
 
-    if (!secretKey || !convexSiteUrl) {
+    const priceId =
+      tier === "pro"
+        ? process.env.STRIPE_PRO_PRICE_ID
+        : process.env.STRIPE_PUBLISH_PRICE_ID;
+
+    if (!secretKey || !priceId) {
       throw new Error(
-        "Stripe not configured. Set STRIPE_SECRET_KEY and CONVEX_SITE_URL in Convex environment variables."
+        "Stripe not configured. Set STRIPE_SECRET_KEY, STRIPE_PUBLISH_PRICE_ID, and STRIPE_PRO_PRICE_ID in Convex environment variables."
       );
     }
 
-    const profileId: Id<"profiles"> = await ctx.runMutation(api.profiles.createPendingProfile, {
-      fullName,
-      slug,
-      ...rest,
-    });
-
     const body = new URLSearchParams({
-      "line_items[0][price_data][currency]": "myr",
-      "line_items[0][price_data][product_data][name]": "Pluck Portfolio",
-      "line_items[0][price_data][product_data][description]": `@${slug} — one-time publish fee`,
-      "line_items[0][price_data][unit_amount]": "1000",
+      "line_items[0][price]": priceId,
       "line_items[0][quantity]": "1",
-      mode: "payment",
+      mode: "subscription",
       customer_email: email,
       "metadata[profileId]": profileId,
-      "metadata[slug]": slug,
-      success_url: `${siteUrl}/startup/paid?slug=${encodeURIComponent(slug)}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl}/startup/paid?slug=${encodeURIComponent(slug)}&canceled=true`,
+      "metadata[tier]": tier,
+      success_url: `${siteUrl}/startup/subscribed?tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/pricing`,
     });
 
     const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
@@ -58,8 +47,6 @@ export const createCheckoutSession = action({
     if (!res.ok) {
       throw new Error(session.error?.message ?? `Stripe error: ${JSON.stringify(session)}`);
     }
-
-    await ctx.runMutation(api.profiles.setBillId, { profileId, billId: session.id });
 
     return { checkoutUrl: session.url as string };
   },

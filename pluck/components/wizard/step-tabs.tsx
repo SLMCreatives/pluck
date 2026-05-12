@@ -2,30 +2,54 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Tab } from "@/types/portfolio";
+import type { Tab, ContentBlock } from "@/types/portfolio";
 import { useState } from "react";
-import { Plus, GripVertical, Edit2, Trash2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Plus,
+  ChevronUp,
+  ChevronDown,
+  Pencil,
+  Trash2,
+  Images,
+  Video,
+  Briefcase,
+  ArrowLeft,
+  Check,
+  X,
+} from "lucide-react";
 
 interface StepTabsProps {
   tabs: Tab[];
   onUpdate: (tabs: Tab[]) => void;
   onAddContent: (tabId: string) => void;
+  onDeleteBlock: (tabId: string, blockIndex: number) => void;
   onBack: () => void;
   onFinish: () => void;
 }
 
-const shell =
-  "rounded-3xl border border-white/10 bg-white/[0.03] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]";
+const BLOCK_ICONS: Record<string, React.ElementType> = {
+  gallery: Images,
+  video: Video,
+  experience: Briefcase,
+};
+
+function blockLabel(block: ContentBlock): string {
+  if (block.type === "gallery") return `Gallery · ${block.images.length} image${block.images.length !== 1 ? "s" : ""}`;
+  if (block.type === "video") return block.title ? `Video · ${block.title}` : "Video";
+  if (block.type === "experience") return `${block.title} @ ${block.company}`;
+  return "Block";
+}
+
 const inputBase =
-  "h-12 rounded-2xl border border-white/10 bg-black/30 text-white dark:text-white placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:ring-offset-0";
+  "h-10 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-white/30 transition-colors";
 
 export function StepTabs({
   tabs,
   onUpdate,
   onAddContent,
+  onDeleteBlock,
   onBack,
-  onFinish
+  onFinish,
 }: StepTabsProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -34,174 +58,168 @@ export function StepTabs({
     const newTab: Tab = {
       id: `tab-${Date.now()}`,
       name: `Tab ${tabs.length + 1}`,
-      blocks: []
+      blocks: [],
     };
     onUpdate([...tabs, newTab]);
   };
 
-  const handleRemoveTab = (id: string) =>
-    onUpdate(tabs.filter((t) => t.id !== id));
+  const handleRemoveTab = (id: string) => onUpdate(tabs.filter((t) => t.id !== id));
 
-  const handleStartEdit = (tab: Tab) => {
-    setEditingId(tab.id);
-    setEditName(tab.name);
-  };
-
-  const handleSaveEdit = () => {
+  const startEdit = (tab: Tab) => { setEditingId(tab.id); setEditName(tab.name); };
+  const cancelEdit = () => { setEditingId(null); setEditName(""); };
+  const saveEdit = () => {
     if (editingId && editName.trim()) {
-      onUpdate(
-        tabs.map((t) =>
-          t.id === editingId ? { ...t, name: editName.trim() } : t
-        )
-      );
-      setEditingId(null);
-      setEditName("");
+      onUpdate(tabs.map((t) => (t.id === editingId ? { ...t, name: editName.trim() } : t)));
     }
+    cancelEdit();
   };
 
-  const moveTab = (index: number, direction: "up" | "down") => {
-    const newIndex = direction === "up" ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= tabs.length) return;
-    const newTabs = [...tabs];
-    [newTabs[index], newTabs[newIndex]] = [newTabs[newIndex], newTabs[index]];
-    onUpdate(newTabs);
+  const moveTab = (index: number, dir: "up" | "down") => {
+    const next = dir === "up" ? index - 1 : index + 1;
+    if (next < 0 || next >= tabs.length) return;
+    const arr = [...tabs];
+    [arr[index], arr[next]] = [arr[next], arr[index]];
+    onUpdate(arr);
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in-50 duration-500">
-      <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-          Structure
+    <div className="space-y-8 animate-in fade-in-50 duration-300">
+      <div className="space-y-1.5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+          Step 3 of 4
         </p>
-        <h2 className="text-balance text-3xl font-semibold tracking-tight">
-          Organize your content
-        </h2>
-        <p className="text-sm leading-relaxed text-zinc-300">
-          Create tabs like “Work”, “About”, “Projects”. Keep it clean.
+        <h2 className="text-2xl font-bold tracking-tight">Organise your content</h2>
+        <p className="text-sm text-zinc-400">
+          Create tabs like "Work", "About", "Projects". Add blocks inside each tab.
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {tabs.map((tab, index) => (
-          <Card key={tab.id} className={shell}>
-            <CardContent className="p-5">
+          <div
+            key={tab.id}
+            className="rounded-2xl border border-white/10 bg-white/3 overflow-hidden"
+          >
+            {/* Tab header */}
+            <div className="flex items-center gap-2 px-4 py-3">
+              {/* Reorder */}
+              <div className="flex shrink-0 flex-col">
+                <button
+                  onClick={() => moveTab(index, "up")}
+                  disabled={index === 0}
+                  className="grid h-5 w-5 place-items-center text-zinc-600 transition hover:text-zinc-300 disabled:opacity-20"
+                >
+                  <ChevronUp className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => moveTab(index, "down")}
+                  disabled={index === tabs.length - 1}
+                  className="grid h-5 w-5 place-items-center text-zinc-600 transition hover:text-zinc-300 disabled:opacity-20"
+                >
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {/* Name / inline edit */}
               {editingId === tab.id ? (
-                <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="flex flex-1 items-center gap-2">
                   <Input
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSaveEdit()}
-                    className={inputBase}
+                    onKeyDown={(e) => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
+                    className={`${inputBase} flex-1`}
                     autoFocus
                   />
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={handleSaveEdit}
-                      className="h-12 rounded-2xl bg-white text-black hover:opacity-90"
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      onClick={() => setEditingId(null)}
-                      variant="outline"
-                      className="h-12 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white/10"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
+                  <button onClick={saveEdit} className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition">
+                    <Check className="h-3.5 w-3.5" />
+                  </button>
+                  <button onClick={cancelEdit} className="grid h-8 w-8 place-items-center rounded-lg bg-white/5 text-zinc-500 hover:bg-white/10 transition">
+                    <X className="h-3.5 w-3.5" />
+                  </button>
                 </div>
               ) : (
-                <div className="flex flex-row md:flex-col gap-4 sm:flex-row sm:items-center -my-6">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-10 w-10 rounded-2xl bg-white/5 text-white/80 hover:bg-white/10"
-                      onClick={() => moveTab(index, "up")}
-                      disabled={index === 0}
-                    >
-                      <GripVertical className="h-4 w-4" />
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-10 w-10 rounded-2xl bg-white/5 text-white/80 hover:bg-white/10"
-                      onClick={() => moveTab(index, "down")}
-                      disabled={index === tabs.length - 1}
-                    >
-                      <GripVertical className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white">
-                      {tab.name}
-                    </h3>
-                    <p className="text-sm text-zinc-300">
-                      {tab.blocks.length} block(s)
+                <div className="flex flex-1 items-center justify-between gap-2 min-w-0">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{tab.name}</p>
+                    <p className="text-xs text-zinc-500">
+                      {tab.blocks.length === 0 ? "No blocks yet" : `${tab.blocks.length} block${tab.blocks.length !== 1 ? "s" : ""}`}
                     </p>
                   </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button
                       onClick={() => onAddContent(tab.id)}
-                      className="h-10 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white/10"
+                      className="flex h-8 items-center gap-1.5 rounded-lg bg-white/8 px-3 text-xs font-medium text-zinc-300 transition hover:bg-white/15 hover:text-white"
                     >
-                      <Plus className="md:mr-2 h-4 w-4" />
-                      <span className="hidden md:block">Add Content</span>
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleStartEdit(tab)}
-                      className="h-10 w-10 rounded-2xl bg-white/5 text-white/80 hover:bg-white/10"
+                      <Plus className="h-3.5 w-3.5" />
+                      Add
+                    </button>
+                    <button
+                      onClick={() => startEdit(tab)}
+                      className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/8 hover:text-zinc-300"
                     >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="icon"
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                    <button
                       onClick={() => handleRemoveTab(tab.id)}
                       disabled={tabs.length === 1}
-                      className="h-10 w-10 rounded-2xl bg-white/5 text-white/80 hover:bg-white/10 disabled:opacity-40"
+                      className="grid h-8 w-8 place-items-center rounded-lg text-zinc-600 transition hover:bg-red-500/15 hover:text-red-400 disabled:pointer-events-none disabled:opacity-20"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Blocks list */}
+            {tab.blocks.length > 0 && (
+              <div className="border-t border-white/8 px-4 py-2 space-y-1">
+                {tab.blocks.map((block, bi) => {
+                  const Icon = BLOCK_ICONS[block.type] ?? Briefcase;
+                  return (
+                    <div
+                      key={bi}
+                      className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-zinc-400 hover:bg-white/5 group"
+                    >
+                      <Icon className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
+                      <span className="flex-1 truncate">{blockLabel(block)}</span>
+                      <button
+                        onClick={() => onDeleteBlock(tab.id, bi)}
+                        className="hidden group-hover:grid h-5 w-5 place-items-center rounded text-zinc-600 hover:text-red-400 transition"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         ))}
 
-        <Button
-          variant="outline"
+        <button
           onClick={handleAddTab}
-          className="h-12 w-full rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white/10"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 text-sm font-medium text-zinc-400 transition hover:border-white/30 hover:text-white"
         >
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Tab
-        </Button>
+          <Plus className="h-4 w-4" />
+          Add tab
+        </button>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex gap-3">
         <Button
-          variant="outline"
+          variant="ghost"
           onClick={onBack}
-          className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white"
+          className="h-11 gap-2 rounded-2xl text-zinc-400 hover:text-white"
         >
+          <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
         <Button
           onClick={onFinish}
-          className="h-12 flex-1 rounded-2xl bg-white/90 text-black hover:bg-white hover:text-black"
+          className="h-11 flex-1 rounded-2xl bg-white text-black hover:opacity-90"
         >
-          View Portfolio
+          Preview & Save
         </Button>
       </div>
     </div>

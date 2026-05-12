@@ -2,6 +2,7 @@
 // app/page.tsx
 // ============================================================
 import Link from "next/link";
+import { SiteHeader } from "@/components/site-header";
 
 const features = [
   {
@@ -13,7 +14,7 @@ const features = [
   {
     title: "The Multimedia Vault",
     benefit:
-      "Showcase YouTube reels, Figma prototypes, and Slide decks in one sleek, unified feed.",
+      "Showcase YouTube reels, Figma prototypes, and slide decks in one sleek, unified feed.",
     icon: "🎞️"
   },
   {
@@ -47,28 +48,80 @@ const steps = [
     step: "03"
   },
   {
-    title: "The Launch",
-    desc: "Pay RM 10 to get your custom link and go live to the world.",
+    title: "Go Live",
+    desc: "Upgrade to Publish (RM 9/mo) to get your custom link and go live to the world.",
     step: "04"
   }
 ];
 
+const pricingTiers = [
+  {
+    name: "Free",
+    price: "RM 0",
+    period: "",
+    description: "Build and preview your portfolio at no cost.",
+    features: [
+      "Full portfolio builder",
+      "Live phone preview",
+      "Saved as draft",
+      "Unlimited edits",
+    ],
+    cta: "Start Building",
+    ctaHref: "/startup",
+    highlight: false,
+    badge: null,
+  },
+  {
+    name: "Publish",
+    price: "RM 9",
+    period: "/mo",
+    description: "Go live and share your profile with the world.",
+    features: [
+      "Everything in Free",
+      "Live public URL",
+      "All content blocks",
+      "WhatsApp / Email inquiries",
+      "Multimedia vault",
+    ],
+    cta: "Upgrade to Publish",
+    ctaHref: "/pricing",
+    highlight: true,
+    badge: "Most popular",
+  },
+  {
+    name: "Pro",
+    price: "RM 19",
+    period: "/mo",
+    description: "Stand out with a custom domain and analytics.",
+    features: [
+      "Everything in Publish",
+      "Custom domain",
+      "Profile analytics",
+      "Priority support",
+    ],
+    cta: "Upgrade to Pro",
+    ctaHref: "/pricing",
+    highlight: false,
+    badge: null,
+  },
+];
+
 const faqs = [
   {
-    q: "Why RM 10?",
-    a: "We believe a professional presence shouldn't cost a fortune. RM 10 gets you a month of Pro access and a published page. It's less than a Starbucks latte."
+    q: "Is Free really free forever?",
+    a: "Yes. You can build your full portfolio, add all your content, and preview it on a phone mockup — completely free. You only pay when you want to go live with a public URL."
+  },
+  {
+    q: "What's the difference between Publish and Pro?",
+    a: "Publish (RM 9/mo) gives you a live public URL and all content features. Pro (RM 19/mo) adds a custom domain (e.g. yourname.com), profile analytics so you can see who's visiting, and priority support."
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes. There are no contracts or lock-in periods. Cancel from your billing portal at any time. Your profile will remain live until the end of the billing period, then revert to draft."
   },
   {
     q: "Do I need to be a designer to make it look good?",
     a: "Not at all. Our structured layout system ensures that no matter what you upload, it follows high-end design principles automatically."
-  },
-  {
-    q: "What happens after the first month?",
-    a: "You can renew for just RM 8/month to keep your Pro tabs and custom URL active. If you stop, your basic info stays free, but Pro sections are hidden."
-  },
-  {
-    q: "Can I use my own domain?",
-    a: "Yes! Pro users can connect their own .com or .my domains easily."
   }
 ];
 
@@ -83,7 +136,7 @@ export default function Page() {
 
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div className="space-y-6">
-            <Badge>Mobile-first • 5-minute setup • RM 10 to publish</Badge>
+            <Badge>Mobile-first • 5-minute setup • Free to build</Badge>
 
             <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               Your professional flex, built in 5 minutes.
@@ -91,23 +144,24 @@ export default function Page() {
 
             <p className="text-pretty text-base leading-relaxed text-zinc-300 sm:text-lg">
               Stop sending messy folders. Create a high-converting, mobile-first
-              portfolio that turns leads into clients.
+              portfolio that turns leads into clients — free to build, publish
+              when you're ready.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <PrimaryCTA href="/startup">
-                Build My Portfolio — Start Free
+                Build My Portfolio — It's Free
               </PrimaryCTA>
-              <SecondaryCTA href="#how">See how it works</SecondaryCTA>
+              <SecondaryCTA href="#pricing">See pricing</SecondaryCTA>
             </div>
 
-            <div className="flex items-center gap-3 text-sm text-zinc-400">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-400">
               <span className="inline-flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
                 No design skills required
               </span>
               <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline">Just RM 10 to publish</span>
+              <span className="hidden sm:inline">Publish from RM 9/mo</span>
             </div>
           </div>
 
@@ -154,29 +208,29 @@ export default function Page() {
           <div className="lg:col-span-7">
             <Card className="p-7">
               <blockquote className="text-pretty text-base leading-relaxed text-zinc-200">
-                <span className="text-zinc-400">“</span>I spent 8 hours a day in
+                <span className="text-zinc-400">"</span>I spent 8 hours a day in
                 a corporate office, but my real passion was{" "}
                 <span className="font-semibold text-white">
                   [Design/Consulting/Coding]
                 </span>{" "}
                 on the side. When a big client asked for my work, I realized I
                 had nothing professional to show them—just a bunch of PDFs and
-                dead links. I didn’t have time to master a complex website
+                dead links. I didn't have time to master a complex website
                 builder. I needed something fast, cheap, and mobile-friendly.
                 <span className="block" />
                 <span className="mt-4 block">
                   So, I built{" "}
-                  <span className="font-semibold text-white">Lume</span> for all
+                  <span className="font-semibold text-white">Pluck</span> for all
                   of us who are hustling between meetings to build something of
                   our own.
                 </span>
-                <span className="text-zinc-400">”</span>
+                <span className="text-zinc-400">"</span>
               </blockquote>
               <div className="mt-6 flex items-center justify-between gap-4">
                 <div className="text-sm text-zinc-400">— Founder, Pluck</div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">
                   <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
-                  Fast • Cheap • Mobile-first
+                  Fast • Affordable • Mobile-first
                 </span>
               </div>
             </Card>
@@ -186,7 +240,7 @@ export default function Page() {
             <Card className="p-7">
               <h3 className="text-base font-semibold">The vibe</h3>
               <p className="mt-2 text-sm leading-relaxed text-zinc-300">
-                You are not trying to build a \&quot;website.\&quot; You are
+                You are not trying to build a &quot;website.&quot; You are
                 trying to win the next client.
               </p>
               <ul className="mt-5 space-y-3 text-sm text-zinc-300">
@@ -200,7 +254,7 @@ export default function Page() {
                 </li>
                 <li className="flex gap-3">
                   <Check />
-                  Publish for RM 10. Upgrade later.
+                  Free to build. Publish from RM 9/mo.
                 </li>
               </ul>
 
@@ -240,7 +294,65 @@ export default function Page() {
         </div>
       </section>
 
-      {/* PRICING / CTA */}
+      {/* PRICING */}
+      <section id="pricing" className="mx-auto max-w-6xl px-6 py-14">
+        <SectionHeader
+          kicker="Pricing"
+          title="Build free. Publish when you're ready."
+          subtitle="No surprise fees. Cancel anytime. Your profile, your timeline."
+        />
+
+        <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          {pricingTiers.map((tier) => (
+            <div
+              key={tier.name}
+              className={`relative flex flex-col rounded-3xl border p-8 ${
+                tier.highlight
+                  ? "border-indigo-500 bg-indigo-500/5"
+                  : "border-white/10 bg-white/[0.03]"
+              }`}
+            >
+              {tier.badge && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-500 px-3 py-0.5 text-xs font-semibold text-white">
+                  {tier.badge}
+                </span>
+              )}
+
+              <div className="mb-6">
+                <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+                  {tier.name}
+                </p>
+                <p className="mt-2 flex items-end gap-1">
+                  <span className="text-4xl font-bold">{tier.price}</span>
+                  <span className="mb-1 text-zinc-500">{tier.period}</span>
+                </p>
+                <p className="mt-2 text-sm text-zinc-400">{tier.description}</p>
+              </div>
+
+              <ul className="mb-8 flex-1 space-y-3">
+                {tier.features.map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm text-zinc-300">
+                    <Check />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              {tier.highlight ? (
+                <PrimaryCTA href={tier.ctaHref}>{tier.cta}</PrimaryCTA>
+              ) : (
+                <SecondaryCTA href={tier.ctaHref}>{tier.cta}</SecondaryCTA>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-6 text-center text-xs text-zinc-500">
+          All plans include unlimited profile edits. Paid plans billed monthly. Cancel anytime.
+        </p>
+      </section>
+
+      {/* CTA BANNER */}
       <section id="start" className="mx-auto max-w-6xl px-6 py-14">
         <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-8 sm:p-10">
           <div className="pointer-events-none absolute inset-0 opacity-40">
@@ -248,61 +360,28 @@ export default function Page() {
             <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-emerald-500 blur-3xl" />
           </div>
 
-          <div className="relative grid gap-8 lg:grid-cols-2 lg:items-center">
-            <div>
-              <h2 className="text-balance text-2xl font-semibold sm:text-3xl">
-                Publish your portfolio for RM 10.
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-300 sm:text-base">
-                Build free. Preview instantly. Pay only when you are ready to go
-                live.
-              </p>
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <PrimaryCTA href="/startup">
-                  Build My Portfolio — Start Free
-                </PrimaryCTA>
-                <Link
-                  href="#faq"
-                  className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/10"
-                >
-                  Read FAQ
-                </Link>
-              </div>
-              <p className="mt-4 text-xs text-zinc-400">
-                No design skills required • Mobile-first editing • Lead capture
-                included
-              </p>
+          <div className="relative flex flex-col items-center gap-6 text-center">
+            <h2 className="text-balance text-2xl font-semibold sm:text-3xl">
+              Ready to stop sending PDFs?
+            </h2>
+            <p className="max-w-lg text-sm leading-relaxed text-zinc-300 sm:text-base">
+              Build your portfolio for free. Preview it live. Upgrade to go
+              public when you feel good about it.
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <PrimaryCTA href="/startup">
+                Build My Portfolio — It's Free
+              </PrimaryCTA>
+              <Link
+                href="#faq"
+                className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/10"
+              >
+                Read FAQ
+              </Link>
             </div>
-
-            <div className="grid gap-3 rounded-2xl border border-white/10 bg-black/40 p-6">
-              <div className="flex items-baseline justify-between">
-                <p className="text-sm font-semibold">Pro Publishing</p>
-                <p className="text-2xl font-semibold">RM 10</p>
-              </div>
-              <p className="text-sm text-zinc-300">
-                1 month of Pro access + published page
-              </p>
-              <div className="my-2 h-px bg-white/10" />
-              <ul className="space-y-2 text-sm text-zinc-300">
-                <li className="flex gap-3">
-                  <Check /> Custom link + live page
-                </li>
-                <li className="flex gap-3">
-                  <Check /> WhatsApp / Email inquiries
-                </li>
-                <li className="flex gap-3">
-                  <Check /> Multimedia vault
-                </li>
-                <li className="flex gap-3">
-                  <Check /> Mobile-first editing
-                </li>
-              </ul>
-              <div className="mt-3 rounded-xl bg-white/5 p-3 text-xs text-zinc-300">
-                Renew later for{" "}
-                <span className="font-semibold text-white">RM 8/month</span> to
-                keep Pro tabs + custom URL.
-              </div>
-            </div>
+            <p className="text-xs text-zinc-500">
+              No credit card required to start • Publish from RM 9/mo
+            </p>
           </div>
         </div>
       </section>
@@ -343,43 +422,6 @@ export default function Page() {
 // ============================================================
 // Components (local)
 // ============================================================
-function SiteHeader() {
-  return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="#" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-white/10 text-sm font-semibold">
-            P
-          </span>
-          <span className="text-sm font-semibold tracking-tight">Pluck</span>
-        </Link>
-        <nav className="hidden items-center gap-6 text-sm text-zinc-300 sm:flex">
-          <Link className="hover:text-white" href="#features">
-            Features
-          </Link>
-          <Link className="hover:text-white" href="#story">
-            Story
-          </Link>
-          <Link className="hover:text-white" href="#how">
-            How it works
-          </Link>
-          <Link className="hover:text-white" href="#faq">
-            FAQ
-          </Link>
-        </nav>
-        <div className="flex items-center gap-3">
-          <Link
-            href="#start"
-            className="hidden rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10 sm:inline-flex"
-          >
-            Start Free
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
-
 function SiteFooter() {
   return (
     <footer className="border-t border-white/10 py-10">
@@ -400,7 +442,10 @@ function SiteFooter() {
             <Link className="hover:text-white" href="#">
               Terms
             </Link>
-            <Link className="hover:text-white" href="#start">
+            <Link className="hover:text-white" href="#pricing">
+              Pricing
+            </Link>
+            <Link className="hover:text-white" href="/startup">
               Build
             </Link>
           </div>
@@ -498,7 +543,7 @@ function Card({
 
 function Check() {
   return (
-    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
+    <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
       ✓
     </span>
   );

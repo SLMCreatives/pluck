@@ -122,7 +122,7 @@ function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
       />
 
       {/* Drop zone */}
-      <label className="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-white/20 bg-white/[0.02] p-10 transition hover:border-white/40 hover:bg-white/[0.04]">
+      <label className="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-white/20 bg-white/2 p-10 transition hover:border-white/40 hover:bg-white/4">
         <input
           type="file"
           accept="image/*"
@@ -155,7 +155,7 @@ function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
               <img
                 src={image.url}
                 alt={image.alt}
-                className="h-14 w-14 rounded-xl object-cover border border-white/10 flex-shrink-0"
+                className="h-14 w-14 rounded-xl object-cover border border-white/10 shrink-0"
               />
               <Input
                 placeholder="Add a description…"
@@ -167,7 +167,7 @@ function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemove(index)}
-                className="h-9 w-9 flex-shrink-0 rounded-xl bg-white/5 text-white/60 hover:bg-white/10"
+                className="h-9 w-9 shrink-0 rounded-xl bg-white/5 text-white/60 hover:bg-white/10"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -328,7 +328,7 @@ function ExperienceForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
 
         <div className="space-y-2">
           <Label className={fieldLabel}>Company Logo (Optional)</Label>
-          <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-white/20 bg-white/[0.02] p-4 transition hover:border-white/40">
+          <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-white/20 bg-white/2 p-4 transition hover:border-white/40">
             <input
               type="file"
               accept="image/*"

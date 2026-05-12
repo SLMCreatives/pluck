@@ -26,9 +26,20 @@ export default defineSchema({
         })
       )
     ),
+    phone: v.optional(v.string()),
+    showPhone: v.optional(v.boolean()),
     slug: v.optional(v.string()),
     published: v.optional(v.boolean()),
     userId: v.optional(v.id("users")),
     billId: v.optional(v.string()),
-  }).index("by_slug", ["slug"]).index("by_user", ["userId"]).index("by_bill", ["billId"]),
+    tier: v.optional(v.union(v.literal("free"), v.literal("publish"), v.literal("pro"))),
+    stripeCustomerId: v.optional(v.string()),
+    stripeSubscriptionId: v.optional(v.string()),
+    subscriptionStatus: v.optional(v.string()),
+    viewCount: v.optional(v.number()),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_user", ["userId"])
+    .index("by_bill", ["billId"])
+    .index("by_stripe_customer", ["stripeCustomerId"]),
 });

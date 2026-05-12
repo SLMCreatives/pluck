@@ -74,10 +74,75 @@ State machine with steps: `onboarding -> social -> tabs -> blocks -> block-form 
 - Dark theme throughout; zinc/indigo/emerald palette
 - The landing page (`app/page.tsx`) defines all its UI components locally rather than using shared components
 
+## Pricing Strategy (Freemium + Subscription)
+
+| Tier    | Price    | Features |
+|---------|----------|----------|
+| Free    | RM 0/mo  | Build & preview, profile saved as draft (unpublished) |
+| Publish | RM 9/mo  | Live public URL, all content features |
+| Pro     | RM 19/mo | Custom domain, analytics, priority support |
+
+### User flow (new)
+
+1. **Sign up → Wizard → Dashboard (Free)**
+   - User completes wizard and clicks "Save Profile" (no payment).
+   - `saveProfile` mutation writes the profile with `tier: "free"`, `published: false`.
+   - Redirect to `/dashboard`. Dashboard shows a "Your profile is unpublished — upgrade to go live" banner with an Upgrade CTA.
+
+2. **Upgrade to Publish or Pro**
+   - User clicks Upgrade on the dashboard or visits `/pricing`.
+   - Calls `createSubscriptionCheckout` action with chosen tier (`publish` | `pro`).
+   - Action creates a Stripe **subscription** checkout session (mode: `subscription`) using the relevant price ID, passes `profileId` in metadata.
+   - Stripe redirects to success URL `/startup/subscribed?tier=publish` (or `pro`) on payment.
+   - Stripe POSTs `checkout.session.completed` webhook → `activateSubscription` mutation sets `published: true`, `tier`, `stripeCustomerId`, `stripeSubscriptionId`.
+   - `/startup/subscribed` polls `getMyProfile` for `published === true`, then auto-redirects to `/dashboard`.
+
+3. **Subscription lifecycle**
+   - `customer.subscription.updated` → update `tier` if plan changed (upgrade/downgrade).
+   - `customer.subscription.deleted` / `invoice.payment_failed` after grace period → set `published: false`, `tier: "free"`.
+   - Dashboard provides a link to the Stripe Customer Portal for billing management.
+
+### Schema changes (`convex/schema.ts`)
+Add to `profiles` table:
+- `tier: v.optional(v.union(v.literal("free"), v.literal("publish"), v.literal("pro")))` — defaults to `"free"` on insert
+- `stripeCustomerId: v.optional(v.string())`
+- `stripeSubscriptionId: v.optional(v.string())`
+- `subscriptionStatus: v.optional(v.string())` — mirrors Stripe status: `"active"`, `"past_due"`, `"canceled"`, etc.
+- `billId` field kept (optional) for backward compat but no longer used for new profiles
+
+### Backend changes (`convex/`)
+- `profiles.ts` — add `saveProfile` mutation (replaces wizard's use of `createPendingProfile`); add `activateSubscription` mutation; add `setSubscriptionStatus` mutation; add `createBillingPortalSession` action
+- `stripe.ts` — replace `createCheckoutSession` (one-time) with `createSubscriptionCheckout` (subscription mode); accepts `tier: "publish" | "pro"` and `profileId`
+- `http.ts` — handle `checkout.session.completed` (subscription), `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
+
+### Environment variables (add to Convex dashboard)
+- `STRIPE_PUBLISH_PRICE_ID` — Stripe recurring price ID for Publish tier (RM 9/mo)
+- `STRIPE_PRO_PRICE_ID` — Stripe recurring price ID for Pro tier (RM 19/mo)
+
+### Webhook events to register in Stripe dashboard
+- `checkout.session.completed`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+- `invoice.payment_failed`
+
+### Frontend changes
+- `app/startup/page.tsx` — final step calls `saveProfile` (no Stripe); redirects to `/dashboard`
+- `app/startup/paid/page.tsx` → rename/repurpose as `app/startup/subscribed/page.tsx` — polls for `published` status, then redirects to `/dashboard`
+- `app/pricing/page.tsx` — new pricing comparison page with Upgrade CTAs per tier
+- `app/dashboard/page.tsx` — add tier badge; show "Unpublished" banner + Upgrade CTA for free users; show billing portal link for paid users
+
+---
+
 ## Remaining To-Do
 
 - [x] **Image uploads** — UploadThing (`@uploadthing/react`); file router at `app/api/uploadthing/core.ts`; helpers at `lib/uploadthing.ts`; endpoints: `galleryImage`, `profileImage`, `companyLogo`. Requires `UPLOADTHING_TOKEN` env var.
 - [x] **Profile editing** — `app/dashboard/edit/page.tsx` reuses wizard steps pre-populated from `getMyProfile`; `updateProfile` mutation in `convex/profiles.ts` patches existing record with slug uniqueness re-check.
 - [x] **Dashboard** — `app/dashboard/page.tsx`: profile card, stats tiles, public URL copy button, live phone preview, links to edit and view public profile. Protected by middleware. Redirects to `/startup` if no profile exists.
-- [x] **Publishing flow** — Stripe Checkout payment gate (RM 10) before publish. Flow: wizard → `createPendingProfile` (published: false) → Stripe Checkout session → payment → Stripe POSTs to `CONVEX_SITE_URL/stripe/webhook` (HMAC-SHA256 verified) → `publishByBillId` sets published: true → user lands on `app/startup/paid/page.tsx` which subscribes to `getPublishStatus` and auto-redirects to `/dashboard`. Requires `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` in Convex env vars. Webhook endpoint to register in Stripe dashboard: `{CONVEX_SITE_URL}/stripe/webhook`, event: `checkout.session.completed`.
-- [ ] **Public profile polish** — wire "Contact Me" button to WhatsApp/email using `socialLinks`; custom domain support.
+- [x] **Publishing flow (old)** — replaced by subscription model below.
+- [x] **Subscription publishing flow** — `createSubscriptionCheckout` action in `convex/stripe.ts`; webhook handles `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed` in `convex/http.ts`; `activateSubscription` and `setSubscriptionStatus` mutations in `convex/profiles.ts`.
+- [x] **Pricing page** — `app/pricing/page.tsx` with 3-tier comparison, auth-aware CTAs, current plan detection.
+- [x] **Subscription success page** — `app/startup/subscribed/page.tsx` polls `getMyProfile.published`, auto-redirects to dashboard.
+- [x] **Dashboard subscription UI** — tier badge on profile card; amber unpublished banner with Upgrade CTA; billing portal link for paid users via `createBillingPortalSession`.
+- [x] **Public profile polish** — "Contact Me" button wired to WhatsApp (`wa.me/{digits}`) → email (`mailto:`) → first social link priority chain. Unpublished profile shows distinct "not published yet" page vs 404.
+- [x] **Profile analytics** — `viewCount` field on schema; `incrementViewCount` mutation fires on public profile page load; dashboard shows live count for Pro users, locked teaser tile for Publish/Free.
+- [ ] **Custom domain support** — Pro tier. Requires DNS CNAME handling and middleware hostname resolution.

@@ -123,10 +123,10 @@ export function StepOnboarding({
               <img
                 src={formData.profileImage}
                 alt="Profile"
-                className="h-14 w-14 rounded-2xl object-cover border border-white/10 flex-shrink-0"
+                className="h-14 w-14 rounded-2xl object-cover border border-white/10 shrink-0"
               />
             ) : (
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/5 flex-shrink-0">
+              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/5 shrink-0">
                 {avatarUploading ? (
                   <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
                 ) : (
