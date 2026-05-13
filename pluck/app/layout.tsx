@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { ConvexClientProvider } from "./ConvexClientProvider";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Pluck — Build your portfolio in 5 minutes",
-  description: "Mobile-first portfolio builder for freelancers and side-hustlers."
+  description:
+    "Mobile-first portfolio builder for freelancers and side-hustlers."
 };
 
 export default function RootLayout({
@@ -31,6 +33,10 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <ConvexClientProvider>{children}</ConvexClientProvider>
+          <Script
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon='{"token": "898cf19b8fec4506aa17bf66edd006ec"}'
+          />
         </body>
       </html>
     </ConvexAuthNextjsServerProvider>
