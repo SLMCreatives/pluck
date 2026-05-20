@@ -13,11 +13,12 @@ interface BlockFormProps {
   type: "gallery" | "video" | "experience";
   onSave: (block: ContentBlock) => void;
   onCancel: () => void;
+  remainingImages?: number;
 }
 
-export function BlockForm({ type, onSave, onCancel }: BlockFormProps) {
+export function BlockForm({ type, onSave, onCancel, remainingImages }: BlockFormProps) {
   if (type === "gallery")
-    return <GalleryForm onSave={onSave} onCancel={onCancel} />;
+    return <GalleryForm onSave={onSave} onCancel={onCancel} remainingImages={remainingImages} />;
   if (type === "video")
     return <VideoForm onSave={onSave} onCancel={onCancel} />;
   if (type === "experience")
@@ -63,14 +64,14 @@ function BottomActions({
       <Button
         variant="outline"
         onClick={left.onClick}
-        className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white/10"
+        className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white/90 hover:bg-white/10 hover:text-black"
       >
         {left.label}
       </Button>
       <Button
         onClick={right.onClick}
         disabled={disabled}
-        className="h-12 flex-1 rounded-2xl bg-white text-black hover:opacity-90"
+        className="h-12 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
       >
         {right.label}
       </Button>
@@ -78,18 +79,24 @@ function BottomActions({
   );
 }
 
-function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
+function GalleryForm({ onSave, onCancel, remainingImages }: Omit<BlockFormProps, "type">) {
   const [images, setImages] = useState<{ url: string; alt: string }[]>([]);
   const [uploading, setUploading] = useState(false);
 
   const { startUpload } = useUploadThing("galleryImage");
 
+  const imageLimit = remainingImages ?? Infinity;
+  const slotsLeft = Math.max(0, imageLimit - images.length);
+  const atImageLimit = isFinite(imageLimit) && images.length >= imageLimit;
+
   const handleFiles = useCallback(
     async (files: FileList | null) => {
       if (!files || files.length === 0) return;
+      const allowed = Array.from(files).slice(0, slotsLeft);
+      if (allowed.length === 0) return;
       setUploading(true);
       try {
-        const res = await startUpload(Array.from(files));
+        const res = await startUpload(allowed);
         if (res) {
           const uploaded = res.map((f) => ({ url: f.ufsUrl, alt: "" }));
           setImages((prev) => [...prev, ...uploaded]);
@@ -98,7 +105,7 @@ function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
         setUploading(false);
       }
     },
-    [startUpload]
+    [startUpload, slotsLeft]
   );
 
   const handleAltChange = (index: number, value: string) => {
@@ -121,15 +128,37 @@ function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
         desc="Upload photos from your device — we’ll make it look premium automatically."
       />
 
+      {/* Image limit indicator */}
+      {isFinite(imageLimit) && (
+        <div className={[
+          "flex items-center justify-between rounded-xl border px-3 py-2 text-xs font-semibold",
+          atImageLimit
+            ? "border-indigo-500/30 bg-indigo-500/5 text-indigo-400"
+            : "border-white/10 bg-white/3 text-zinc-400",
+        ].join(" ")}>
+          <span>Images: {images.length} / {imageLimit}</span>
+          {atImageLimit && (
+            <a href="/pricing" className="underline underline-offset-2 hover:text-indigo-300">
+              Upgrade for unlimited
+            </a>
+          )}
+        </div>
+      )}
+
       {/* Drop zone */}
-      <label className="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-white/20 bg-white/2 p-10 transition hover:border-white/40 hover:bg-white/4">
+      <label className={[
+        "group flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed p-10 transition",
+        atImageLimit
+          ? "cursor-not-allowed border-white/10 bg-white/1 opacity-40"
+          : "cursor-pointer border-white/20 bg-white/2 hover:border-white/40 hover:bg-white/4",
+      ].join(" ")}>
         <input
           type="file"
           accept="image/*"
           multiple
           className="sr-only"
           onChange={(e) => handleFiles(e.target.files)}
-          disabled={uploading}
+          disabled={uploading || atImageLimit}
         />
         {uploading ? (
           <Loader2 className="h-7 w-7 animate-spin text-zinc-400" />
@@ -138,9 +167,13 @@ function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
         )}
         <div className="text-center">
           <p className="text-sm font-semibold text-white/80">
-            {uploading ? "Uploading…" : "Click to upload images"}
+            {uploading ? "Uploading…" : atImageLimit ? "Image limit reached" : "Click to upload images"}
           </p>
-          <p className="text-xs text-zinc-500">PNG, JPG, WEBP up to 4 MB each</p>
+          <p className="text-xs text-zinc-500">
+            {isFinite(imageLimit) && !atImageLimit
+              ? `${slotsLeft} slot${slotsLeft === 1 ? "" : "s"} remaining · PNG, JPG, WEBP up to 4 MB each`
+              : "PNG, JPG, WEBP up to 4 MB each"}
+          </p>
         </div>
       </label>
 
@@ -167,7 +200,7 @@ function GalleryForm({ onSave, onCancel }: Omit<BlockFormProps, "type">) {
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemove(index)}
-                className="h-9 w-9 shrink-0 rounded-xl bg-white/5 text-white/60 hover:bg-white/10"
+                className="h-9 w-9 shrink-0 rounded-xl bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
               >
                 <X className="h-4 w-4" />
               </Button>

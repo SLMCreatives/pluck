@@ -50,7 +50,7 @@ const steps = [
   },
   {
     title: "Go Live",
-    desc: "Upgrade to Publish (RM 9/mo) to get your custom link and go live to the world.",
+    desc: "Your profile publishes instantly on the Free plan. Upgrade to Publish from RM 19 for a custom username and unlimited content.",
     step: "04"
   }
 ];
@@ -60,12 +60,13 @@ const pricingTiers = [
     name: "Free",
     price: "RM 0",
     period: "",
-    description: "Build and preview your portfolio at no cost.",
+    description: "Build and go live — no credit card required.",
     features: [
-      "Full portfolio builder",
-      "Live phone preview",
-      "Saved as draft",
-      "Unlimited edits",
+      "3 blocks, 3 projects (tabs)",
+      "6 images total",
+      "Auto-generated public URL",
+      "Basic lead capture (WhatsApp / Email)",
+      "Peek badge on profile",
     ],
     cta: "Start Building",
     ctaHref: "/startup",
@@ -74,15 +75,15 @@ const pricingTiers = [
   },
   {
     name: "Publish",
-    price: "RM 9",
+    price: "RM 19",
     period: "/mo",
-    description: "Go live and share your profile with the world.",
+    description: "Custom username and no Peek badge.",
     features: [
-      "Everything in Free",
-      "Live public URL",
-      "All content blocks",
-      "WhatsApp / Email inquiries",
-      "Multimedia vault",
+      "Unlimited blocks, projects & images",
+      "Custom username (peek.com.my/yourname)",
+      "No Peek badge",
+      "Enhanced lead capture",
+      "Basic analytics (view count)",
     ],
     cta: "Upgrade to Publish",
     ctaHref: "/pricing",
@@ -91,13 +92,14 @@ const pricingTiers = [
   },
   {
     name: "Pro",
-    price: "RM 19",
+    price: "RM 39",
     period: "/mo",
-    description: "Stand out with a custom domain and analytics.",
+    description: "Custom domain and advanced analytics.",
     features: [
       "Everything in Publish",
-      "Custom domain",
-      "Profile analytics",
+      "Custom domain (yourname.com)",
+      "Advanced analytics",
+      "Multiple portfolios",
       "Priority support",
     ],
     cta: "Upgrade to Pro",
@@ -110,15 +112,15 @@ const pricingTiers = [
 const faqs = [
   {
     q: "Is Free really free forever?",
-    a: "Yes. You can build your full portfolio, add all your content, and preview it on a phone mockup — completely free. You only pay when you want to go live with a public URL."
+    a: "Yes. You can build your full portfolio, go live with an auto-generated URL, and share it — completely free. You only pay if you want a custom username or advanced features."
   },
   {
-    q: "What's the difference between Publish and Pro?",
-    a: "Publish (RM 9/mo) gives you a live public URL and all content features. Pro (RM 19/mo) adds a custom domain (e.g. yourname.com), profile analytics so you can see who's visiting, and priority support."
+    q: "What's the difference between Free and Publish?",
+    a: "Publish (RM 19/mo or RM 149/yr) gives you a custom username (peek.com.my/yourname), removes the Peek badge, and includes basic analytics. Pro — with custom domains and advanced analytics — is coming soon."
   },
   {
     q: "Can I cancel anytime?",
-    a: "Yes. There are no contracts or lock-in periods. Cancel from your billing portal at any time. Your profile will remain live until the end of the billing period, then revert to draft."
+    a: "Yes. There are no contracts or lock-in periods. Cancel from your billing portal at any time. Your profile will stay live on the Free plan — you just lose the custom username and premium features."
   },
   {
     q: "Do I need to be a designer to make it look good?",
@@ -162,7 +164,7 @@ export default function Page() {
                 No design skills required
               </span>
               <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline">Publish from RM 9/mo</span>
+              <span className="hidden sm:inline">Custom URL from RM 19/mo</span>
             </div>
           </div>
 
@@ -175,7 +177,7 @@ export default function Page() {
       {/* FEATURES */}
       <section id="features" className="mx-auto max-w-6xl px-6 py-14">
         <SectionHeader
-          kicker="Why Pluck"
+          kicker="Why Peek"
           title="Everything you need to look premium — instantly."
           subtitle="Answer a few prompts, drop in your best work, and share a link that actually converts."
         />
@@ -221,14 +223,14 @@ export default function Page() {
                 <span className="block" />
                 <span className="mt-4 block">
                   So, I built{" "}
-                  <span className="font-semibold text-white">Pluck</span> for all
+                  <span className="font-semibold text-white">Peek</span> for all
                   of us who are hustling between meetings to build something of
                   our own.
                 </span>
                 <span className="text-zinc-400">"</span>
               </blockquote>
               <div className="mt-6 flex items-center justify-between gap-4">
-                <div className="text-sm text-zinc-400">— Founder, Pluck</div>
+                <div className="text-sm text-zinc-400">— Founder, Peek</div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">
                   <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
                   Fast • Affordable • Mobile-first
@@ -255,7 +257,7 @@ export default function Page() {
                 </li>
                 <li className="flex gap-3">
                   <Check />
-                  Free to build. Publish from RM 9/mo.
+                  Free to build and go live. Custom URL from RM 19/mo.
                 </li>
               </ul>
 
@@ -339,7 +341,14 @@ export default function Page() {
                 ))}
               </ul>
 
-              {tier.highlight ? (
+              {tier.name === "Pro" ? (
+                <button
+                  disabled
+                  className="inline-flex w-full items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-zinc-500 cursor-not-allowed"
+                >
+                  Coming Soon
+                </button>
+              ) : tier.highlight ? (
                 <PrimaryCTA href={tier.ctaHref}>{tier.cta}</PrimaryCTA>
               ) : (
                 <SecondaryCTA href={tier.ctaHref}>{tier.cta}</SecondaryCTA>
@@ -433,7 +442,7 @@ function SiteFooter() {
               P
             </span>
             <span>
-              © {new Date().getFullYear()} Pluck. All rights reserved.
+              © {new Date().getFullYear()} Peek. All rights reserved.
             </span>
           </div>
           <div className="flex gap-5 text-sm text-zinc-400">
@@ -499,7 +508,7 @@ function PrimaryCTA({
   return (
     <Link
       href={href}
-      className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black hover:opacity-90"
+      className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-900 hover:text-white transition-colors"
     >
       {children}
     </Link>

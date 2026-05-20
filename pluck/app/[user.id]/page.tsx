@@ -42,14 +42,14 @@ export default function ProfilePage({
           </div>
           <h1 className="text-xl font-semibold">Profile not published yet</h1>
           <p className="text-sm text-zinc-400">
-            <span className="font-mono text-zinc-300">pluck.link/{slug}</span>{" "}
+            <span className="font-mono text-zinc-300">peek.com.my/{slug}</span>{" "}
             exists but hasn&apos;t been made public yet.
           </p>
           <Link
             href="/"
             className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition"
           >
-            Back to Pluck
+            Back to Peek
           </Link>
         </div>
       </div>
@@ -63,13 +63,13 @@ export default function ProfilePage({
           <p className="text-2xl font-semibold">404</p>
           <p className="text-sm text-zinc-400">
             No profile found at{" "}
-            <span className="font-mono text-white">pluck.link/{slug}</span>
+            <span className="font-mono text-white">peek.com.my/{slug}</span>
           </p>
           <Link
             href="/"
             className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition"
           >
-            Back to Pluck
+            Back to Peek
           </Link>
         </div>
       </div>
@@ -87,5 +87,5 @@ export default function ProfilePage({
     tabs: (profile.tabs ?? []) as PortfolioData["tabs"],
   };
 
-  return <PortfolioPreview data={data} />;
+  return <PortfolioPreview data={data} showBadge={!profile.tier || profile.tier === "free"} />;
 }

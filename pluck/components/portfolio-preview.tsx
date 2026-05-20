@@ -22,6 +22,7 @@ import Link from "next/link";
 interface PortfolioPreviewProps {
   data: PortfolioData;
   activeTab?: string;
+  showBadge?: boolean;
 }
 
 const SOCIAL_ICONS: Record<string, any> = {
@@ -45,7 +46,7 @@ function contactIcon(href: string) {
   return ArrowUpRight;
 }
 
-export function PortfolioPreview({ data, activeTab }: PortfolioPreviewProps) {
+export function PortfolioPreview({ data, activeTab, showBadge = true }: PortfolioPreviewProps) {
   const initialTab = activeTab || data.tabs[0]?.id;
   const [selectedTabId, setSelectedTabId] = useState(initialTab);
   const currentTab =
@@ -136,7 +137,7 @@ export function PortfolioPreview({ data, activeTab }: PortfolioPreviewProps) {
                       href={contactHref}
                       target={isNative ? "_self" : "_blank"}
                       rel="noopener noreferrer"
-                      className="group inline-flex h-10 items-center gap-2.5 rounded-full bg-white px-7 text-sm font-bold text-black shadow-[0_0_28px_rgba(255,255,255,0.15)] transition-all duration-200 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] active:scale-95"
+                      className="group inline-flex h-10 items-center gap-2.5 rounded-full bg-white px-7 text-sm font-bold text-black shadow-[0_0_28px_rgba(255,255,255,0.15)] transition-all duration-200 hover:bg-zinc-900 hover:text-white hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] active:scale-95"
                     >
                       <Icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                       Contact Me
@@ -213,19 +214,21 @@ export function PortfolioPreview({ data, activeTab }: PortfolioPreviewProps) {
       </div>
 
       {/* ── Footer ── */}
-      <div className="mx-auto max-w-2xl px-5 pb-10">
-        <div className="flex items-center justify-center gap-2 border-t border-white/5 pt-8">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-zinc-600 transition hover:text-zinc-400"
-          >
-            <span className="grid h-5 w-5 place-items-center rounded-lg bg-white/10 text-[10px] font-bold text-white">
-              P
-            </span>
-            Built with Pluck
-          </Link>
+      {showBadge && (
+        <div className="mx-auto max-w-2xl px-5 pb-10">
+          <div className="flex items-center justify-center gap-2 border-t border-white/5 pt-8">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs text-zinc-600 transition hover:text-zinc-400"
+            >
+              <span className="grid h-5 w-5 place-items-center rounded-lg bg-white/10 text-[10px] font-bold text-white">
+                P
+              </span>
+              Built with Peek
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

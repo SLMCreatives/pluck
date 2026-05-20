@@ -207,14 +207,14 @@ export function StepSocial({ data, phone, showPhone, onUpdate, onUpdatePhone, on
         <Button
           variant="ghost"
           onClick={onBack}
-          className="h-11 gap-2 rounded-2xl text-zinc-400 hover:text-white"
+          className="h-11 gap-2 rounded-2xl text-zinc-400 hover:text-black"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
         <Button
           onClick={onNext}
-          className="h-11 flex-1 rounded-2xl bg-white text-black hover:opacity-90"
+          className="h-11 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
         >
           Continue
         </Button>

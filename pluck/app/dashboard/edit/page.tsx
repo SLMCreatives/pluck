@@ -14,6 +14,7 @@ import { BlockForm } from "@/components/wizard/block-forms";
 import { StepTabs } from "@/components/wizard/step-tabs";
 import { Button } from "@/components/ui/button";
 import { LogOut, Check, ArrowLeft } from "lucide-react";
+import { limitsForTier, countTotalBlocks, countTotalImages } from "@/lib/limits";
 
 type WizardStep = "onboarding" | "social" | "tabs" | "blocks" | "block-form" | "preview";
 
@@ -137,7 +138,9 @@ export default function EditProfilePage() {
             onBack={() => setStep("onboarding")}
           />
         );
-      case "tabs":
+      case "tabs": {
+        const limits = limitsForTier(profile?.tier);
+        const totalBlocks = countTotalBlocks(portfolioData.tabs);
         return (
           <StepTabs
             tabs={portfolioData.tabs}
@@ -146,8 +149,12 @@ export default function EditProfilePage() {
             onDeleteBlock={deleteBlockFromTab}
             onBack={() => setStep("social")}
             onFinish={() => setStep("preview")}
+            totalBlocks={totalBlocks}
+            maxTabs={limits.tabs}
+            maxBlocks={limits.blocks}
           />
         );
+      }
       case "blocks":
         return (
           <StepBlocks
@@ -155,15 +162,22 @@ export default function EditProfilePage() {
             onBack={() => setStep("tabs")}
           />
         );
-      case "block-form":
+      case "block-form": {
+        const limits = limitsForTier(profile?.tier);
+        const usedImages = countTotalImages(portfolioData.tabs);
+        const remainingImages = Math.max(0, limits.images - usedImages);
         return selectedBlockType && currentTabId ? (
           <BlockForm
             type={selectedBlockType}
             onSave={(block) => addBlockToTab(currentTabId, block)}
             onCancel={() => setStep("tabs")}
+            remainingImages={isFinite(limits.images) ? remainingImages : undefined}
           />
         ) : null;
-      case "preview":
+      }
+      case "preview": {
+        const tier = profile?.tier ?? "free";
+        const isPaid = tier !== "free";
         return (
           <div className="space-y-8 animate-in fade-in-50 duration-300">
             <div className="space-y-1.5">
@@ -172,51 +186,68 @@ export default function EditProfilePage() {
               </p>
               <h2 className="text-2xl font-bold tracking-tight">Looking good!</h2>
               <p className="text-sm text-zinc-400">
-                Review your changes, update your username if needed, then save.
+                Review your changes{isPaid ? ", update your username if needed," : ""} then save.
               </p>
             </div>
 
-            {/* Username */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                Username
-              </label>
-              <div className="flex h-11 items-center gap-0 overflow-hidden rounded-xl border border-white/10 bg-white/5 focus-within:border-white/30 transition-colors">
-                <span className="shrink-0 border-r border-white/10 bg-white/3 px-3 text-sm text-zinc-500">
-                  pluck.link/
-                </span>
-                <input
-                  value={slug}
-                  onChange={(e) => {
-                    setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
-                    setSaveError(null);
-                  }}
-                  placeholder="yourname"
-                  className="flex-1 bg-transparent px-3 text-sm text-white outline-none placeholder:text-zinc-600"
-                />
+            {/* Username — Publish/Pro only */}
+            {isPaid ? (
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                  Username
+                </label>
+                <div className="flex h-11 items-center gap-0 overflow-hidden rounded-xl border border-white/10 bg-white/5 focus-within:border-white/30 transition-colors">
+                  <span className="shrink-0 border-r border-white/10 bg-white/3 px-3 text-sm text-zinc-500">
+                    peek.com.my/
+                  </span>
+                  <input
+                    value={slug}
+                    onChange={(e) => {
+                      setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
+                      setSaveError(null);
+                    }}
+                    placeholder="yourname"
+                    className="flex-1 bg-transparent px-3 text-sm text-white outline-none placeholder:text-zinc-600"
+                  />
+                </div>
               </div>
-              {saveError && <p className="text-sm text-red-400">{saveError}</p>}
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                  Your URL
+                </label>
+                <div className="flex h-11 items-center overflow-hidden rounded-xl border border-white/10 bg-white/5 px-3">
+                  <span className="text-sm text-zinc-400">peek.com.my/{slug}</span>
+                </div>
+                <p className="text-xs text-zinc-500">
+                  <a href="/pricing" className="text-indigo-400 hover:text-indigo-300 transition">Upgrade to Publish</a>{" "}
+                  to set a custom username.
+                </p>
+              </div>
+            )}
+
+            {saveError && <p className="text-sm text-red-400">{saveError}</p>}
 
             <div className="flex gap-3">
               <Button
                 variant="ghost"
                 onClick={() => setStep("tabs")}
-                className="h-11 gap-2 rounded-2xl text-zinc-400 hover:text-white"
+                className="h-11 gap-2 rounded-2xl text-zinc-400 hover:text-black"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </Button>
               <Button
-                disabled={!slug || saving}
+                disabled={saving}
                 onClick={handleSave}
-                className="h-11 flex-1 rounded-2xl bg-white text-black hover:opacity-90"
+                className="h-11 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
               >
                 {saving ? "Saving…" : "Save Changes"}
               </Button>
             </div>
           </div>
         );
+      }
     }
   };
 
@@ -228,7 +259,7 @@ export default function EditProfilePage() {
       <header className="flex items-center justify-between border-b border-white/8 px-6 py-4">
         <div className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/10 text-xs font-bold">P</span>
-          <span className="text-sm font-semibold">Pluck</span>
+          <span className="text-sm font-semibold">Peek</span>
         </div>
 
         {/* Step progress — desktop */}

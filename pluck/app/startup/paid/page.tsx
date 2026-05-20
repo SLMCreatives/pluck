@@ -36,7 +36,7 @@ export default function PaidPage({
         <p className="text-zinc-400">
           Your portfolio has been saved. You can try again anytime.
         </p>
-        <Button asChild className="h-12 w-full rounded-2xl bg-white text-black hover:bg-zinc-200">
+        <Button asChild className="h-12 w-full rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors">
           <Link href="/startup">Back to wizard</Link>
         </Button>
       </Shell>
@@ -49,7 +49,7 @@ export default function PaidPage({
         <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-400" />
         <h1 className="text-2xl font-semibold">You&apos;re live!</h1>
         <p className="text-zinc-400">Redirecting you to your dashboard&hellip;</p>
-        <Button asChild className="h-12 w-full rounded-2xl bg-white text-black hover:bg-zinc-200">
+        <Button asChild className="h-12 w-full rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors">
           <Link href="/dashboard">Go to dashboard</Link>
         </Button>
       </Shell>
@@ -64,7 +64,7 @@ export default function PaidPage({
         This usually takes a few seconds. Please don&apos;t close this tab.
       </p>
       {slug && (
-        <p className="font-mono text-sm text-zinc-500">pluck.link/{slug}</p>
+        <p className="font-mono text-sm text-zinc-500">peek.com.my/{slug}</p>
       )}
     </Shell>
   );

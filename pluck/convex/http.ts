@@ -58,48 +58,18 @@ http.route({
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
       const profileId = session.metadata?.profileId as Id<"profiles"> | undefined;
-      const tier = session.metadata?.tier as "publish" | "pro" | undefined;
+      const tier = session.metadata?.tier as "publish" | undefined;
+      const months = parseInt(session.metadata?.months ?? "1", 10);
       const stripeCustomerId = session.customer as string | undefined;
-      const stripeSubscriptionId = session.subscription as string | undefined;
 
-      if (profileId && tier && stripeCustomerId && stripeSubscriptionId) {
+      if (profileId && tier === "publish" && stripeCustomerId) {
         await ctx.runMutation(api.profiles.activateSubscription, {
           profileId,
           tier,
           stripeCustomerId,
-          stripeSubscriptionId,
+          months,
         });
       }
-    }
-
-    if (event.type === "customer.subscription.updated") {
-      const sub = event.data.object;
-      const stripeCustomerId = sub.customer as string;
-      const status = sub.status as string;
-
-      // Determine tier from the plan's price ID
-      const priceId: string = sub.items?.data?.[0]?.price?.id ?? "";
-      let tier: "publish" | "pro" | undefined;
-      if (priceId === process.env.STRIPE_PRO_PRICE_ID) tier = "pro";
-      else if (priceId === process.env.STRIPE_PUBLISH_PRICE_ID) tier = "publish";
-
-      await ctx.runMutation(api.profiles.setSubscriptionStatus, {
-        stripeCustomerId,
-        subscriptionStatus: status,
-        ...(tier ? { tier } : {}),
-      });
-    }
-
-    if (
-      event.type === "customer.subscription.deleted" ||
-      event.type === "invoice.payment_failed"
-    ) {
-      const obj = event.data.object;
-      const stripeCustomerId = (obj.customer ?? obj.customer_id) as string;
-      await ctx.runMutation(api.profiles.setSubscriptionStatus, {
-        stripeCustomerId,
-        subscriptionStatus: event.type === "customer.subscription.deleted" ? "canceled" : "past_due",
-      });
     }
 
     return new Response("ok", { status: 200 });

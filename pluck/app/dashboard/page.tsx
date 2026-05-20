@@ -1,6 +1,6 @@
 "use client";
 
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,12 +16,12 @@ import {
   Check,
   Layers,
   Link2,
-  Rocket,
-  CreditCard,
   Eye,
   Lock,
   Globe,
   ArrowUpRight,
+  CalendarClock,
+  AlertTriangle,
 } from "lucide-react";
 import type { PortfolioData } from "@/types/portfolio";
 
@@ -30,11 +30,17 @@ const TIER_LABEL: Record<string, string> = {
   publish: "Publish",
   pro: "Pro",
 };
-const TIER_PRICE: Record<string, string> = {
-  free: "RM 0 / mo",
-  publish: "RM 9 / mo",
-  pro: "RM 19 / mo",
-};
+function formatExpiry(ts: number): string {
+  return new Date(ts).toLocaleDateString("en-MY", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function daysUntil(ts: number): number {
+  return Math.ceil((ts - Date.now()) / (1000 * 60 * 60 * 24));
+}
 
 function TierBadge({ tier }: { tier: string }) {
   if (tier === "pro")
@@ -56,30 +62,6 @@ function TierBadge({ tier }: { tier: string }) {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  if (status === "active")
-    return (
-      <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
-        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-        Active
-      </span>
-    );
-  if (status === "past_due")
-    return (
-      <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-400">
-        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-        Past due
-      </span>
-    );
-  if (status === "canceled")
-    return (
-      <span className="flex items-center gap-1.5 text-xs font-semibold text-red-400">
-        <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
-        Canceled
-      </span>
-    );
-  return null;
-}
 
 function Toggle({
   checked,
@@ -114,12 +96,10 @@ function Toggle({
 export default function DashboardPage() {
   const profile = useQuery(api.profiles.getMyProfile);
   const setPublished = useMutation(api.profiles.setPublished);
-  const createBillingPortalSession = useAction(api.profiles.createBillingPortalSession);
   const { signOut } = useAuthActions();
   const router = useRouter();
 
   const [copied, setCopied] = useState(false);
-  const [portalLoading, setPortalLoading] = useState(false);
   const [publishToggling, setPublishToggling] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
 
@@ -148,8 +128,10 @@ export default function DashboardPage() {
 
   const tier = profile.tier ?? "free";
   const isPaid = tier !== "free";
-  const hasBillingPortal = !!profile.stripeCustomerId;
-  const publicUrl = `pluck.link/${profile.slug}`;
+  const expiresAt = profile.subscriptionExpiresAt ?? null;
+  const daysLeft = expiresAt ? daysUntil(expiresAt) : null;
+  const isExpiringSoon = daysLeft !== null && daysLeft <= 7 && daysLeft > 0;
+  const publicUrl = `peek.com.my/${profile.slug}`;
   const totalBlocks = data.tabs.reduce((n, t) => n + t.blocks.length, 0);
 
   const copyUrl = () => {
@@ -170,15 +152,6 @@ export default function DashboardPage() {
     }
   };
 
-  const openBillingPortal = async () => {
-    setPortalLoading(true);
-    try {
-      const { url } = await createBillingPortalSession({});
-      window.location.href = url;
-    } finally {
-      setPortalLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -187,7 +160,7 @@ export default function DashboardPage() {
           <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold">
             P
           </span>
-          <span className="text-sm font-semibold">Pluck</span>
+          <span className="text-sm font-semibold">Peek</span>
         </div>
         <button
           onClick={() => signOut()}
@@ -251,7 +224,7 @@ export default function DashboardPage() {
               </div>
               <p className="mt-2 text-3xl font-semibold">{totalBlocks}</p>
             </div>
-            {profile.tier === "pro" ? (
+            {isPaid ? (
               <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
                 <div className="flex items-center gap-2 text-zinc-400">
                   <Eye className="h-4 w-4" />
@@ -269,7 +242,7 @@ export default function DashboardPage() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-zinc-950/80 backdrop-blur-sm">
                   <Lock className="h-4 w-4 text-zinc-500" />
                   <Link href="/pricing" className="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
-                    Pro only
+                    Upgrade to Publish
                   </Link>
                 </div>
               </div>
@@ -318,18 +291,18 @@ export default function DashboardPage() {
               )}
             </div>
           ) : (
-            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
+            <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-4">
               <div className="flex items-start gap-3">
-                <Rocket className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+                <Globe className="mt-0.5 h-4 w-4 shrink-0 text-indigo-400" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-amber-300">Your profile is unpublished</p>
-                  <p className="mt-0.5 text-xs text-amber-400/80">
-                    Upgrade to go live and share your public URL.
+                  <p className="text-sm font-semibold text-indigo-300">You&apos;re live on the Free plan</p>
+                  <p className="mt-0.5 text-xs text-indigo-400/80">
+                    Upgrade to Publish for a custom username and no Peek badge.
                   </p>
                 </div>
                 <Button
                   asChild
-                  className="h-8 shrink-0 rounded-xl bg-amber-500 px-3 text-xs font-semibold text-black hover:bg-amber-400"
+                  className="h-8 shrink-0 rounded-xl bg-indigo-500 px-3 text-xs font-semibold text-white hover:bg-indigo-400"
                 >
                   <Link href="/pricing">Upgrade</Link>
                 </Button>
@@ -339,63 +312,56 @@ export default function DashboardPage() {
 
           {/* ── Subscription & Billing ── */}
           <div className="rounded-2xl border border-white/10 bg-white/3 p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                Plan & Billing
-              </p>
-              {profile.subscriptionStatus && (
-                <StatusBadge status={profile.subscriptionStatus} />
-              )}
-            </div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              Plan & Billing
+            </p>
 
             {isPaid ? (
               <>
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xl font-bold">{TIER_LABEL[tier]} Plan</p>
-                    <p className="text-sm text-zinc-400">{TIER_PRICE[tier]}, billed monthly</p>
+                    {expiresAt && (
+                      <p className="mt-0.5 text-sm text-zinc-400">
+                        Active until {formatExpiry(expiresAt)}
+                      </p>
+                    )}
                   </div>
                   <TierBadge tier={tier} />
                 </div>
 
-                {tier === "publish" && (
-                  <Link
-                    href="/pricing"
-                    className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition"
-                  >
-                    Upgrade to Pro for analytics & custom domain
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
+                {isExpiringSoon && (
+                  <div className="flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2.5">
+                    <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
+                    <p className="text-xs text-amber-300">
+                      Expires in {daysLeft} day{daysLeft === 1 ? "" : "s"} — renew to stay live.
+                    </p>
+                  </div>
                 )}
 
-                {hasBillingPortal ? (
-                  <button
-                    onClick={openBillingPortal}
-                    disabled={portalLoading}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-50"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    {portalLoading ? "Opening portal…" : "Manage billing & subscription"}
-                  </button>
-                ) : (
-                  <p className="text-xs text-zinc-500">
-                    Subscription not yet linked. Contact support if you believe this is an error.
-                  </p>
-                )}
+                <Button
+                  asChild
+                  className="h-10 w-full rounded-xl bg-indigo-500 text-white hover:bg-indigo-400"
+                >
+                  <Link href="/pricing" className="flex items-center justify-center gap-2">
+                    <CalendarClock className="h-4 w-4" />
+                    Renew or extend
+                  </Link>
+                </Button>
               </>
             ) : (
               <>
                 <div>
                   <p className="text-xl font-bold">Free Plan</p>
-                  <p className="text-sm text-zinc-400">Build & preview — no live URL</p>
+                  <p className="text-sm text-zinc-400">Live with auto-generated URL</p>
                 </div>
                 <div className="space-y-2">
                   <p className="text-xs text-zinc-500">
-                    Upgrade to publish your profile and get a shareable URL.
+                    Upgrade to Publish for a custom username, no badge, and analytics.
                   </p>
                   <Button
                     asChild
-                    className="h-10 w-full rounded-xl bg-white text-black hover:opacity-90"
+                    className="h-10 w-full rounded-xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
                   >
                     <Link href="/pricing" className="flex items-center justify-center gap-2">
                       View plans
@@ -429,7 +395,7 @@ export default function DashboardPage() {
             <Button
               asChild
               variant="outline"
-              className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white hover:bg-white/10"
+              className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
             >
               <Link href={`/${profile.slug}`} target="_blank" className="flex items-center gap-2">
                 <ExternalLink className="h-4 w-4" />
@@ -438,7 +404,7 @@ export default function DashboardPage() {
             </Button>
             <Button
               asChild
-              className="h-12 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-200"
+              className="h-12 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
             >
               <Link href="/dashboard/edit" className="flex items-center gap-2">
                 <Edit2 className="h-4 w-4" />

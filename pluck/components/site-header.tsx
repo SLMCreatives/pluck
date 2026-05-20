@@ -27,7 +27,7 @@ export function SiteHeader() {
           <span className="grid h-9 w-9 place-items-center rounded-2xl bg-white/10 text-sm font-semibold">
             P
           </span>
-          <span className="text-sm font-semibold tracking-tight">Pluck</span>
+          <span className="text-sm font-semibold tracking-tight">Peek</span>
         </Link>
 
         {/* Desktop nav */}
@@ -51,7 +51,7 @@ export function SiteHeader() {
           ) : isLoggedIn ? (
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-black hover:opacity-90 transition"
+              className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-zinc-900 hover:text-white transition-colors"
             >
               <LayoutDashboard className="h-4 w-4" />
               Dashboard
@@ -66,7 +66,7 @@ export function SiteHeader() {
               </Link>
               <Link
                 href="/startup"
-                className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-black hover:opacity-90 transition"
+                className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-zinc-900 hover:text-white transition-colors"
               >
                 Start Free
               </Link>
@@ -105,7 +105,7 @@ export function SiteHeader() {
               <Link
                 href="/dashboard"
                 onClick={() => setMobileOpen(false)}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-black"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-zinc-900 hover:text-white transition-colors"
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
@@ -122,7 +122,7 @@ export function SiteHeader() {
                 <Link
                   href="/startup"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-2xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-black"
+                  className="rounded-2xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-black hover:bg-zinc-900 hover:text-white transition-colors"
                 >
                   Start Free
                 </Link>

@@ -33,9 +33,11 @@ export default defineSchema({
     userId: v.optional(v.id("users")),
     billId: v.optional(v.string()),
     tier: v.optional(v.union(v.literal("free"), v.literal("publish"), v.literal("pro"))),
+    billingPeriod: v.optional(v.union(v.literal("monthly"), v.literal("yearly"))),
     stripeCustomerId: v.optional(v.string()),
     stripeSubscriptionId: v.optional(v.string()),
     subscriptionStatus: v.optional(v.string()),
+    subscriptionExpiresAt: v.optional(v.number()),
     viewCount: v.optional(v.number()),
   })
     .index("by_slug", ["slug"])

@@ -1,4 +1,4 @@
-import { action, mutation, query } from "./_generated/server";
+import { action, internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { api } from "./_generated/api";
@@ -117,7 +117,7 @@ export const updateProfile = mutation({
     showPhone: v.optional(v.boolean()),
     socialLinks: v.array(v.object({ platform: v.string(), url: v.string() })),
     tabs: v.array(v.object({ id: v.string(), name: v.string(), blocks: v.array(v.any()) })),
-    slug: v.string(),
+    slug: v.optional(v.string()), // only honoured for Publish/Pro tier
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -129,15 +129,26 @@ export const updateProfile = mutation({
       .unique();
     if (!profile) throw new Error("Profile not found.");
 
-    if (args.slug !== profile.slug) {
+    const tier = profile.tier ?? "free";
+    if (tier === "free") validateFreeLimits(args.tabs);
+
+    let slug = profile.slug;
+
+    if (args.slug && args.slug !== profile.slug) {
+      if (tier === "free") {
+        throw new Error("Upgrade to Publish to use a custom username.");
+      }
       const taken = await ctx.db
         .query("profiles")
         .withIndex("by_slug", (q) => q.eq("slug", args.slug))
         .unique();
-      if (taken) throw new Error(`The username "${args.slug}" is already taken.`);
+      if (taken && taken._id !== profile._id)
+        throw new Error(`The username "${args.slug}" is already taken.`);
+      slug = args.slug;
     }
 
-    await ctx.db.patch(profile._id, args);
+    const { slug: _ignored, ...rest } = args;
+    await ctx.db.patch(profile._id, { ...rest, slug });
     return profile._id;
   },
 });
@@ -153,8 +164,8 @@ export const setPublished = mutation({
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .unique();
     if (!profile) throw new Error("Profile not found.");
-    if (published && !profile.stripeCustomerId)
-      throw new Error("Upgrade required to publish.");
+    if ((profile.tier ?? "free") === "free")
+      throw new Error("Upgrade to manage your profile visibility.");
     await ctx.db.patch(profile._id, { published });
   },
 });
@@ -172,7 +183,31 @@ export const incrementViewCount = mutation({
   },
 });
 
-// Saves profile as a free draft — no payment required.
+// Generates a short unique random slug (free-tier auto URL).
+async function generateUniqueSlug(ctx: { db: { query: (table: string) => { withIndex: (index: string, fn: (q: { eq: (field: string, value: string) => unknown }) => unknown) => { unique: () => Promise<unknown> } } } }): Promise<string> {
+  for (let i = 0; i < 10; i++) {
+    const slug = Math.random().toString(36).slice(2, 9);
+    const taken = await (ctx.db as any)
+      .query("profiles")
+      .withIndex("by_slug", (q: any) => q.eq("slug", slug))
+      .unique();
+    if (!taken) return slug;
+  }
+  throw new Error("Could not generate a unique URL — please try again.");
+}
+
+function validateFreeLimits(tabs: { blocks: unknown[] }[]) {
+  const totalBlocks = tabs.reduce((n, t) => n + t.blocks.length, 0);
+  const totalImages = tabs
+    .flatMap((t) => t.blocks as { type: string; images?: unknown[] }[])
+    .filter((b) => b.type === "gallery")
+    .reduce((n, b) => n + (b.images?.length ?? 0), 0);
+  if (tabs.length > 3) throw new Error("Free plan: maximum 3 projects (tabs). Upgrade to Publish for unlimited.");
+  if (totalBlocks > 3) throw new Error("Free plan: maximum 3 blocks. Upgrade to Publish for unlimited.");
+  if (totalImages > 6) throw new Error("Free plan: maximum 6 images total. Upgrade to Publish for unlimited.");
+}
+
+// Saves the initial profile as a free user — publishes immediately with an auto-generated slug.
 export const saveProfile = mutation({
   args: {
     fullName: v.string(),
@@ -183,7 +218,6 @@ export const saveProfile = mutation({
     showPhone: v.optional(v.boolean()),
     socialLinks: v.array(v.object({ platform: v.string(), url: v.string() })),
     tabs: v.array(v.object({ id: v.string(), name: v.string(), blocks: v.array(v.any()) })),
-    slug: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -195,105 +229,63 @@ export const saveProfile = mutation({
       .unique();
 
     if (existing) {
-      if (args.slug !== existing.slug) {
-        const taken = await ctx.db
-          .query("profiles")
-          .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-          .unique();
-        if (taken && taken._id !== existing._id)
-          throw new Error(`The username "${args.slug}" is already taken.`);
-      }
+      if ((existing.tier ?? "free") === "free") validateFreeLimits(args.tabs);
       await ctx.db.patch(existing._id, { ...args });
       return existing._id;
     }
 
-    const taken = await ctx.db
-      .query("profiles")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-      .unique();
-    if (taken) throw new Error(`The username "${args.slug}" is already taken.`);
-
+    validateFreeLimits(args.tabs);
+    const slug = await generateUniqueSlug(ctx as any);
     return await ctx.db.insert("profiles", {
       ...args,
-      published: false,
+      slug,
+      published: true,
       tier: "free",
       userId,
     });
   },
 });
 
-// Called by Stripe webhook after subscription checkout completes.
+// Called by Stripe webhook after one-time checkout completes.
 export const activateSubscription = mutation({
   args: {
     stripeCustomerId: v.string(),
-    stripeSubscriptionId: v.string(),
-    tier: v.union(v.literal("publish"), v.literal("pro")),
+    tier: v.literal("publish"),
     profileId: v.id("profiles"),
+    months: v.number(),
   },
-  handler: async (ctx, { stripeCustomerId, stripeSubscriptionId, tier, profileId }) => {
+  handler: async (ctx, { stripeCustomerId, tier, profileId, months }) => {
+    const existing = await ctx.db.get(profileId);
+    // If they already have an active subscription, extend it; otherwise start fresh.
+    const base = existing?.subscriptionExpiresAt && existing.subscriptionExpiresAt > Date.now()
+      ? existing.subscriptionExpiresAt
+      : Date.now();
+    const subscriptionExpiresAt = base + months * 30 * 24 * 60 * 60 * 1000;
     await ctx.db.patch(profileId, {
       published: true,
       tier,
       stripeCustomerId,
-      stripeSubscriptionId,
-      subscriptionStatus: "active",
+      subscriptionExpiresAt,
     });
   },
 });
 
-// Called by webhook when subscription is updated or deleted.
-export const setSubscriptionStatus = mutation({
-  args: {
-    stripeCustomerId: v.string(),
-    subscriptionStatus: v.string(),
-    tier: v.optional(v.union(v.literal("free"), v.literal("publish"), v.literal("pro"))),
-  },
-  handler: async (ctx, { stripeCustomerId, subscriptionStatus, tier }) => {
-    const profile = await ctx.db
-      .query("profiles")
-      .withIndex("by_stripe_customer", (q) => q.eq("stripeCustomerId", stripeCustomerId))
-      .unique();
-    if (!profile) return;
-
-    const isActive = subscriptionStatus === "active";
-    await ctx.db.patch(profile._id, {
-      subscriptionStatus,
-      ...(tier ? { tier } : {}),
-      published: isActive,
-      ...(!isActive ? { tier: "free" as const } : {}),
-    });
-  },
-});
-
-// Creates a Stripe Customer Portal session so users can manage billing.
-export const createBillingPortalSession = action({
+// Runs on a cron schedule to unpublish profiles whose subscription has expired.
+export const expireSubscriptions = internalMutation({
   args: {},
-  handler: async (ctx): Promise<{ url: string }> => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated.");
-
-    const profile = await ctx.runQuery(api.profiles.getMyProfile);
-    if (!profile?.stripeCustomerId) throw new Error("No active subscription found.");
-
-    const secretKey = process.env.STRIPE_SECRET_KEY;
-    const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
-    if (!secretKey) throw new Error("Stripe not configured.");
-
-    const res = await fetch("https://api.stripe.com/v1/billing_portal/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${secretKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        customer: profile.stripeCustomerId,
-        return_url: `${siteUrl}/dashboard`,
-      }).toString(),
-    });
-
-    const session = await res.json();
-    if (!res.ok) throw new Error(session.error?.message ?? "Stripe portal error");
-    return { url: session.url as string };
+  handler: async (ctx) => {
+    const now = Date.now();
+    const profiles = await ctx.db.query("profiles").collect();
+    for (const profile of profiles) {
+      if (
+        profile.tier === "publish" &&
+        profile.subscriptionExpiresAt &&
+        profile.subscriptionExpiresAt < now &&
+        profile.published
+      ) {
+        await ctx.db.patch(profile._id, { published: false, tier: "free" });
+      }
+    }
   },
 });
 

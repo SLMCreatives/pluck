@@ -14,6 +14,7 @@ import { BlockForm } from "@/components/wizard/block-forms";
 import { StepTabs } from "@/components/wizard/step-tabs";
 import { Button } from "@/components/ui/button";
 import { LogOut, Check } from "lucide-react";
+import { FREE_LIMITS, countTotalBlocks, countTotalImages } from "@/lib/limits";
 
 type WizardStep = "onboarding" | "social" | "tabs" | "blocks" | "block-form" | "preview";
 
@@ -26,7 +27,6 @@ export default function StartupPage() {
   const [step, setStep] = useState<WizardStep>("onboarding");
   const [selectedBlockType, setSelectedBlockType] = useState<BlockType | null>(null);
   const [currentTabId, setCurrentTabId] = useState<string | null>(null);
-  const [slug, setSlug] = useState("");
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -113,7 +113,8 @@ export default function StartupPage() {
             onBack={() => setStep("onboarding")}
           />
         );
-      case "tabs":
+      case "tabs": {
+        const totalBlocks = countTotalBlocks(portfolioData.tabs);
         return (
           <StepTabs
             tabs={portfolioData.tabs}
@@ -122,8 +123,12 @@ export default function StartupPage() {
             onDeleteBlock={deleteBlockFromTab}
             onBack={() => setStep("social")}
             onFinish={() => setStep("preview")}
+            totalBlocks={totalBlocks}
+            maxTabs={FREE_LIMITS.tabs}
+            maxBlocks={FREE_LIMITS.blocks}
           />
         );
+      }
       case "blocks":
         return (
           <StepBlocks
@@ -131,14 +136,18 @@ export default function StartupPage() {
             onBack={() => setStep("tabs")}
           />
         );
-      case "block-form":
+      case "block-form": {
+        const usedImages = countTotalImages(portfolioData.tabs);
+        const remainingImages = Math.max(0, FREE_LIMITS.images - usedImages);
         return selectedBlockType && currentTabId ? (
           <BlockForm
             type={selectedBlockType}
             onSave={(block) => addBlockToTab(currentTabId, block)}
             onCancel={() => setStep("tabs")}
+            remainingImages={remainingImages}
           />
         ) : null;
+      }
       case "preview":
         return (
           <div className="space-y-8 animate-in fade-in-50 duration-300">
@@ -148,63 +157,42 @@ export default function StartupPage() {
               </p>
               <h2 className="text-2xl font-bold tracking-tight">Almost there!</h2>
               <p className="text-sm text-zinc-400">
-                Choose a username and save. Your live preview is on the right.
+                Your portfolio goes live instantly — free, forever. Check the preview, then publish.
               </p>
             </div>
 
-            {/* Username */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                Your username
-              </label>
-              <div className="flex h-11 items-center overflow-hidden rounded-xl border border-white/10 bg-white/5 focus-within:border-white/30 transition-colors">
-                <span className="shrink-0 border-r border-white/10 bg-white/3 px-3 text-sm text-zinc-500">
-                  pluck.link/
-                </span>
-                <input
-                  value={slug}
-                  onChange={(e) => {
-                    setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
-                    setSaveError(null);
-                  }}
-                  placeholder="yourname"
-                  className="flex-1 bg-transparent px-3 text-sm text-white outline-none placeholder:text-zinc-600"
-                  autoFocus
-                />
-              </div>
-              {saveError && <p className="text-sm text-red-400">{saveError}</p>}
-            </div>
-
-            {/* Free badge */}
+            {/* Live badge */}
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 ring-1 ring-inset ring-emerald-500/20">
               <Check className="h-3 w-3" />
-              Free — upgrade to publish anytime
+              Free — your profile goes live immediately
             </span>
+
+            {saveError && <p className="text-sm text-red-400">{saveError}</p>}
 
             <div className="flex gap-3 pt-2">
               <Button
                 variant="ghost"
                 onClick={() => setStep("tabs")}
-                className="h-11 rounded-2xl text-zinc-400 hover:text-white"
+                className="h-11 rounded-2xl text-zinc-400 hover:text-black"
               >
                 ← Back
               </Button>
               <Button
-                disabled={!slug || saving}
+                disabled={saving}
                 onClick={async () => {
                   setSaving(true);
                   setSaveError(null);
                   try {
-                    await saveProfile({ ...portfolioData, slug });
+                    await saveProfile({ ...portfolioData });
                     router.push("/dashboard");
                   } catch (err: unknown) {
                     setSaveError(err instanceof Error ? err.message : "Something went wrong.");
                     setSaving(false);
                   }
                 }}
-                className="h-11 flex-1 rounded-2xl bg-white text-black hover:opacity-90"
+                className="h-11 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
               >
-                {saving ? "Saving…" : "Save Profile"}
+                {saving ? "Publishing…" : "Publish My Portfolio"}
               </Button>
             </div>
           </div>
@@ -220,7 +208,7 @@ export default function StartupPage() {
       <header className="flex items-center justify-between border-b border-white/8 px-6 py-4">
         <div className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/10 text-xs font-bold">P</span>
-          <span className="text-sm font-semibold">Pluck</span>
+          <span className="text-sm font-semibold">Peek</span>
         </div>
 
         {/* Step progress — desktop */}

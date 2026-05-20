@@ -39,7 +39,7 @@ export default function AuthPage() {
           <span className="grid h-9 w-9 place-items-center rounded-2xl bg-white/10 text-sm font-semibold">
             P
           </span>
-          <span className="text-sm font-semibold tracking-tight">Pluck</span>
+          <span className="text-sm font-semibold tracking-tight">Peek</span>
         </div>
 
         <div className="space-y-2">
@@ -85,7 +85,7 @@ export default function AuthPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-11 bg-white text-black hover:opacity-90"
+            className="w-full h-11 bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
           >
             {loading
               ? "Please wait…"

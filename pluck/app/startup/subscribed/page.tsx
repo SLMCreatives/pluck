@@ -35,7 +35,7 @@ export default function SubscribedPage({
         <p className="text-zinc-400">
           {tierLabel} plan activated. Redirecting you to your dashboard&hellip;
         </p>
-        <Button asChild className="h-12 w-full rounded-2xl bg-white text-black hover:bg-zinc-200">
+        <Button asChild className="h-12 w-full rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors">
           <Link href="/dashboard">Go to dashboard</Link>
         </Button>
       </Shell>

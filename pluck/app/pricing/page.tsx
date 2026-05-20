@@ -8,80 +8,70 @@ import { Button } from "@/components/ui/button";
 import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
-const tiers = [
-  {
-    id: "free" as const,
-    name: "Free",
-    price: "RM 0",
-    period: "",
-    description: "Build and preview your portfolio.",
-    features: [
-      "Full portfolio builder",
-      "Live phone preview",
-      "Saved as draft",
-    ],
-    cta: "Current plan",
-    highlight: false,
-  },
-  {
-    id: "publish" as const,
-    name: "Publish",
-    price: "RM 9",
-    period: "/mo",
-    description: "Go live with a public profile URL.",
-    features: [
-      "Everything in Free",
-      "Live public URL",
-      "All content blocks",
-      "Unlimited edits",
-    ],
-    cta: "Upgrade to Publish",
-    highlight: true,
-  },
-  {
-    id: "pro" as const,
-    name: "Pro",
-    price: "RM 19",
-    period: "/mo",
-    description: "Stand out with custom domain & analytics.",
-    features: [
-      "Everything in Publish",
-      "Custom domain",
-      "Profile analytics",
-      "Priority support",
-    ],
-    cta: "Upgrade to Pro",
-    highlight: false,
-  },
+const MONTH_OPTIONS = [
+  { months: 1,  price: 19,  pricePerMonth: 19,   savings: null },
+  { months: 3,  price: 54,  pricePerMonth: 18,   savings: "Save RM 3" },
+  { months: 6,  price: 99,  pricePerMonth: 16.5, savings: "Save RM 15" },
+  { months: 12, price: 180, pricePerMonth: 15,   savings: "Save RM 48" },
+];
+
+const FREE_FEATURES = [
+  "3 blocks, 3 projects (tabs)",
+  "6 images total",
+  "Auto-generated public URL",
+  "Basic lead capture (WhatsApp / Email)",
+  "Peek badge on profile",
+  "Basic themes only",
+  "No analytics",
+];
+
+const PUBLISH_FEATURES = [
+  "Unlimited blocks, projects & images",
+  "Custom username (peek.com.my/yourname)",
+  "No Peek badge",
+  "Enhanced lead capture",
+  "Basic analytics (view count)",
+  "Premium themes",
+];
+
+const PRO_FEATURES = [
+  "Everything in Publish",
+  "Custom domain (yourname.com)",
+  "Advanced analytics",
+  "Multiple portfolios",
+  "Priority support",
 ];
 
 export default function PricingPage() {
   const router = useRouter();
+  const [selectedMonths, setSelectedMonths] = useState(1);
   const profile = useQuery(api.profiles.getMyProfile);
   const createCheckout = useAction(api.stripe.createSubscriptionCheckout);
-  const [loading, setLoading] = useState<"publish" | "pro" | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const currentUser = useQuery(api.auth.currentUser);
   const currentTier = profile?.tier ?? "free";
 
-  async function handleUpgrade(tier: "publish" | "pro") {
+  const selectedOption = MONTH_OPTIONS.find((o) => o.months === selectedMonths)!;
+
+  async function handleUpgrade() {
     if (!profile) {
       router.push("/startup");
       return;
     }
-    setLoading(tier);
+    setLoading(true);
     setError(null);
     try {
       const { checkoutUrl } = await createCheckout({
         profileId: profile._id,
-        tier,
+        months: selectedMonths,
         email: (currentUser as { email?: string } | null)?.email ?? "",
       });
       window.location.href = checkoutUrl;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
-      setLoading(null);
+      setLoading(false);
     }
   }
 
@@ -92,15 +82,15 @@ export default function PricingPage() {
           <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold">
             P
           </span>
-          <span className="text-sm font-semibold">Pluck</span>
+          <span className="text-sm font-semibold">Peek</span>
         </Link>
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-20">
-        <div className="mb-14 text-center">
+        <div className="mb-14 space-y-4 text-center">
           <h1 className="text-4xl font-bold tracking-tight">Simple pricing</h1>
-          <p className="mt-3 text-zinc-400">
-            Build for free. Publish when you&apos;re ready.
+          <p className="text-zinc-400">
+            Free to build and go live. Upgrade for a custom username and more.
           </p>
         </div>
 
@@ -109,74 +99,139 @@ export default function PricingPage() {
         )}
 
         <div className="grid gap-6 sm:grid-cols-3">
-          {tiers.map((tier) => {
-            const isCurrent = currentTier === tier.id;
-            const isLoading = loading === tier.id;
+          {/* Free */}
+          <div className="flex flex-col rounded-3xl border border-white/10 bg-white/3 p-8">
+            <div className="mb-6">
+              <p className="text-sm font-semibold uppercase tracking-widest text-zinc-400">Free</p>
+              <p className="mt-2 flex items-end gap-1">
+                <span className="text-4xl font-bold">RM 0</span>
+              </p>
+              <p className="mt-2 text-sm text-zinc-400">Build, go live, and share — at no cost.</p>
+            </div>
+            <ul className="mb-8 flex-1 space-y-3">
+              {FREE_FEATURES.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm text-zinc-300">
+                  <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Button
+              asChild
+              variant="outline"
+              className="h-11 w-full rounded-2xl border-white/15 bg-white/5 text-white hover:bg-white/10"
+            >
+              <Link href={currentTier !== "free" ? "/dashboard" : "/startup"}>
+                {currentTier !== "free" ? "Your current base" : "Start for Free"}
+              </Link>
+            </Button>
+          </div>
 
-            return (
-              <div
-                key={tier.id}
-                className={`relative flex flex-col rounded-3xl border p-8 ${
-                  tier.highlight
-                    ? "border-indigo-500 bg-indigo-500/5"
-                    : "border-white/10 bg-white/[0.03]"
-                }`}
-              >
-                {tier.highlight && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-500 px-3 py-0.5 text-xs font-semibold text-white">
-                    Most popular
-                  </span>
+          {/* Publish */}
+          <div className="relative flex flex-col rounded-3xl border border-indigo-500 bg-indigo-500/5 p-8">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-500 px-3 py-0.5 text-xs font-semibold text-white">
+              Most popular
+            </span>
+
+            <div className="mb-6">
+              <p className="text-sm font-semibold uppercase tracking-widest text-zinc-400">Publish</p>
+              <p className="mt-2 flex items-end gap-1">
+                <span className="text-4xl font-bold">RM {selectedOption.price}</span>
+                <span className="mb-1 text-zinc-500">
+                  / {selectedMonths === 1 ? "mo" : `${selectedMonths} mo`}
+                </span>
+              </p>
+              <p className="mt-1 text-xs text-zinc-500">
+                RM {selectedOption.pricePerMonth}/mo
+                {selectedOption.savings && (
+                  <span className="ml-2 font-semibold text-emerald-400">{selectedOption.savings}</span>
                 )}
+              </p>
+              <p className="mt-2 text-sm text-zinc-400">Custom username and no Peek badge.</p>
+            </div>
 
-                <div className="mb-6">
-                  <p className="text-sm font-semibold text-zinc-400 uppercase tracking-widest">
-                    {tier.name}
-                  </p>
-                  <p className="mt-2 flex items-end gap-1">
-                    <span className="text-4xl font-bold">{tier.price}</span>
-                    <span className="mb-1 text-zinc-500">{tier.period}</span>
-                  </p>
-                  <p className="mt-2 text-sm text-zinc-400">{tier.description}</p>
-                </div>
-
-                <ul className="mb-8 flex-1 space-y-3">
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-zinc-300">
-                      <CheckIcon className="h-4 w-4 flex-shrink-0 text-emerald-400" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                {tier.id === "free" ? (
-                  <Button
-                    variant="outline"
-                    disabled
-                    className="h-11 w-full rounded-2xl text-zinc-400"
+            {/* Month selector */}
+            <div className="mb-6 space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                Duration
+              </p>
+              <div className="grid grid-cols-4 gap-1.5">
+                {MONTH_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.months}
+                    onClick={() => setSelectedMonths(opt.months)}
+                    className={[
+                      "rounded-xl py-2 text-xs font-semibold transition-colors",
+                      selectedMonths === opt.months
+                        ? "bg-indigo-500 text-white"
+                        : "bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white",
+                    ].join(" ")}
                   >
-                    {isCurrent ? "Current plan" : tier.cta}
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={isCurrent || isLoading}
-                    onClick={() => handleUpgrade(tier.id)}
-                    className={`h-11 w-full rounded-2xl ${
-                      tier.highlight
-                        ? "bg-indigo-500 hover:bg-indigo-600 text-white"
-                        : "bg-white text-black hover:bg-zinc-200"
-                    }`}
-                  >
-                    {isCurrent
-                      ? "Current plan"
-                      : isLoading
-                      ? "Redirecting…"
-                      : tier.cta}
-                  </Button>
-                )}
+                    {opt.months === 12 ? "1yr" : `${opt.months}mo`}
+                  </button>
+                ))}
               </div>
-            );
-          })}
+            </div>
+
+            <ul className="mb-8 flex-1 space-y-3">
+              {PUBLISH_FEATURES.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm text-zinc-300">
+                  <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+
+            <Button
+              disabled={currentTier === "publish" || loading}
+              onClick={handleUpgrade}
+              className="h-11 w-full rounded-2xl bg-indigo-500 text-white hover:bg-indigo-600"
+            >
+              {currentTier === "publish"
+                ? "Active — Renew to extend"
+                : loading
+                ? "Redirecting…"
+                : `Pay RM ${selectedOption.price}`}
+            </Button>
+          </div>
+
+          {/* Pro — Coming Soon */}
+          <div className="flex flex-col rounded-3xl border border-white/10 bg-white/3 p-8 opacity-60">
+            <div className="mb-6">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold uppercase tracking-widest text-zinc-400">Pro</p>
+                <span className="rounded-full bg-zinc-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                  Coming Soon
+                </span>
+              </div>
+              <p className="mt-2 flex items-end gap-1">
+                <span className="text-4xl font-bold">RM 39</span>
+                <span className="mb-1 text-zinc-500">/mo</span>
+              </p>
+              <p className="mt-2 text-sm text-zinc-400">Custom domain and advanced analytics.</p>
+            </div>
+            <ul className="mb-8 flex-1 space-y-3">
+              {PRO_FEATURES.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm text-zinc-300">
+                  <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-zinc-600" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Button
+              disabled
+              className="h-11 w-full rounded-2xl bg-white/10 text-zinc-500 cursor-not-allowed"
+            >
+              Coming Soon
+            </Button>
+          </div>
         </div>
+
+        <p className="mt-10 text-center text-sm text-zinc-500">
+          Pay once, stay live. Profile unpublishes when your period ends — renew anytime to stay live.
+          <br />
+          Supports credit card and FPX (online banking).
+        </p>
       </main>
     </div>
   );

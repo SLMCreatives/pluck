@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Check,
   X,
+  Lock,
 } from "lucide-react";
 
 interface StepTabsProps {
@@ -25,6 +26,9 @@ interface StepTabsProps {
   onDeleteBlock: (tabId: string, blockIndex: number) => void;
   onBack: () => void;
   onFinish: () => void;
+  totalBlocks: number;
+  maxTabs: number;
+  maxBlocks: number;
 }
 
 const BLOCK_ICONS: Record<string, React.ElementType> = {
@@ -50,7 +54,12 @@ export function StepTabs({
   onDeleteBlock,
   onBack,
   onFinish,
+  totalBlocks,
+  maxTabs,
+  maxBlocks,
 }: StepTabsProps) {
+  const atTabLimit = isFinite(maxTabs) && tabs.length >= maxTabs;
+  const atBlockLimit = isFinite(maxBlocks) && totalBlocks >= maxBlocks;
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
 
@@ -94,6 +103,22 @@ export function StepTabs({
         </p>
       </div>
 
+      {isFinite(maxBlocks) && (
+        <div className={[
+          "flex items-center justify-between rounded-2xl border px-4 py-3 text-xs font-semibold",
+          atBlockLimit
+            ? "border-indigo-500/30 bg-indigo-500/5 text-indigo-400"
+            : "border-white/10 bg-white/3 text-zinc-400",
+        ].join(" ")}>
+          <span>Blocks used: {totalBlocks} / {maxBlocks}</span>
+          {atBlockLimit && (
+            <a href="/pricing" className="underline underline-offset-2 hover:text-indigo-300">
+              Upgrade for unlimited
+            </a>
+          )}
+        </div>
+      )}
+
       <div className="space-y-3">
         {tabs.map((tab, index) => (
           <div
@@ -133,7 +158,7 @@ export function StepTabs({
                   <button onClick={saveEdit} className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition">
                     <Check className="h-3.5 w-3.5" />
                   </button>
-                  <button onClick={cancelEdit} className="grid h-8 w-8 place-items-center rounded-lg bg-white/5 text-zinc-500 hover:bg-white/10 transition">
+                  <button onClick={cancelEdit} className="grid h-8 w-8 place-items-center rounded-lg bg-white/5 text-zinc-500 hover:bg-white/10 hover:text-zinc-200 transition">
                     <X className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -146,13 +171,23 @@ export function StepTabs({
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
-                    <button
-                      onClick={() => onAddContent(tab.id)}
-                      className="flex h-8 items-center gap-1.5 rounded-lg bg-white/8 px-3 text-xs font-medium text-zinc-300 transition hover:bg-white/15 hover:text-white"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                      Add
-                    </button>
+                    {atBlockLimit ? (
+                      <a
+                        href="/pricing"
+                        className="flex h-8 items-center gap-1.5 rounded-lg bg-indigo-500/10 px-3 text-xs font-medium text-indigo-400 transition hover:bg-indigo-500/20"
+                      >
+                        <Lock className="h-3.5 w-3.5" />
+                        Upgrade
+                      </a>
+                    ) : (
+                      <button
+                        onClick={() => onAddContent(tab.id)}
+                        className="flex h-8 items-center gap-1.5 rounded-lg bg-white/8 px-3 text-xs font-medium text-zinc-300 transition hover:bg-white/15 hover:text-white"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        Add
+                      </button>
+                    )}
                     <button
                       onClick={() => startEdit(tab)}
                       className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/8 hover:text-zinc-300"
@@ -197,27 +232,37 @@ export function StepTabs({
           </div>
         ))}
 
-        <button
-          onClick={handleAddTab}
-          className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 text-sm font-medium text-zinc-400 transition hover:border-white/30 hover:text-white"
-        >
-          <Plus className="h-4 w-4" />
-          Add tab
-        </button>
+        {atTabLimit ? (
+          <a
+            href="/pricing"
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-indigo-500/30 text-sm font-medium text-indigo-400 transition hover:border-indigo-500/50"
+          >
+            <Lock className="h-4 w-4" />
+            {maxTabs} project limit reached — Upgrade to Publish for unlimited
+          </a>
+        ) : (
+          <button
+            onClick={handleAddTab}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 text-sm font-medium text-zinc-400 transition hover:border-white/30 hover:text-white"
+          >
+            <Plus className="h-4 w-4" />
+            Add tab ({tabs.length}/{maxTabs})
+          </button>
+        )}
       </div>
 
       <div className="flex gap-3">
         <Button
           variant="ghost"
           onClick={onBack}
-          className="h-11 gap-2 rounded-2xl text-zinc-400 hover:text-white"
+          className="h-11 gap-2 rounded-2xl text-zinc-400 hover:text-black"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
         <Button
           onClick={onFinish}
-          className="h-11 flex-1 rounded-2xl bg-white text-black hover:opacity-90"
+          className="h-11 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
         >
           Preview & Save
         </Button>

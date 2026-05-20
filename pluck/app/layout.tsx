@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pluck — Build your portfolio in 5 minutes",
+  title: "Peek — Build your portfolio in 5 minutes",
   description:
     "Mobile-first portfolio builder for freelancers and side-hustlers."
 };
