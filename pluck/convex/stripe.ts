@@ -41,6 +41,7 @@ export const createSubscriptionCheckout = action({
       customer_email: email,
       "payment_method_types[0]": "card",
       "payment_method_types[1]": "fpx",
+      allow_promotion_codes: "true",
       "metadata[profileId]": profileId,
       "metadata[tier]": "publish",
       "metadata[months]": String(months),
