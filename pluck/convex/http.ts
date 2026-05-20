@@ -62,11 +62,11 @@ http.route({
       const months = parseInt(session.metadata?.months ?? "1", 10);
       const stripeCustomerId = session.customer as string | undefined;
 
-      if (profileId && tier === "publish" && stripeCustomerId) {
+      if (profileId && tier === "publish") {
         await ctx.runMutation(api.profiles.activateSubscription, {
           profileId,
           tier,
-          stripeCustomerId,
+          ...(stripeCustomerId ? { stripeCustomerId } : {}),
           months,
         });
       }

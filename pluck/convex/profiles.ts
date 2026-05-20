@@ -249,7 +249,7 @@ export const saveProfile = mutation({
 // Called by Stripe webhook after one-time checkout completes.
 export const activateSubscription = mutation({
   args: {
-    stripeCustomerId: v.string(),
+    stripeCustomerId: v.optional(v.string()),
     tier: v.literal("publish"),
     profileId: v.id("profiles"),
     months: v.number(),
@@ -264,7 +264,7 @@ export const activateSubscription = mutation({
     await ctx.db.patch(profileId, {
       published: true,
       tier,
-      stripeCustomerId,
+      ...(stripeCustomerId ? { stripeCustomerId } : {}),
       subscriptionExpiresAt,
     });
   },
