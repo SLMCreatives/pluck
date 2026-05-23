@@ -26,7 +26,7 @@ export function SiteHeader() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <Image src="/GoPeek.png" width={36} height={36} alt="GoPeek logo" className="rounded-xl object-contain" />
-          <Image src="/gopeek_logo_text.png" width={80} height={22} alt="GoPeek"opeek wordmark className="object-contain" />
+          <Image src="/gopeek_logo_text.png" width={80} height={22} alt="GoPeek wordmark" className="object-contain" />
         </Link>
 
         {/* Desktop nav */}
