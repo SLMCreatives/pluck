@@ -1,16 +1,17 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 
-// Prices in MYR sen (1 MYR = 100 sen). Bulk discounts applied at 6+ months.
-const AMOUNT_SEN: Record<number, number> = {
-  1: 1900,   // RM 19
-  3: 5400,   // RM 18/mo — save RM 3
-  6: 9900,   // RM 16.50/mo — save RM 15
-  12: 18000, // RM 15/mo — save RM 48
+// Amounts in smallest currency unit (sen for MYR, cents for USD).
+// Numeric values are identical across currencies per pricing strategy.
+const AMOUNT_UNITS: Record<number, number> = {
+  1: 1900,
+  3: 5400,
+  6: 9900,
+  12: 18000,
 };
 
 function amountForMonths(months: number): number {
-  return AMOUNT_SEN[months] ?? months * 1900;
+  return AMOUNT_UNITS[months] ?? months * 1900;
 }
 
 export const createSubscriptionCheckout = action({
@@ -18,8 +19,9 @@ export const createSubscriptionCheckout = action({
     profileId: v.id("profiles"),
     months: v.number(),
     email: v.string(),
+    currency: v.optional(v.string()), // "myr" or "usd"; defaults to "myr"
   },
-  handler: async (_ctx, { profileId, months, email }): Promise<{ checkoutUrl: string }> => {
+  handler: async (_ctx, { profileId, months, email, currency = "myr" }): Promise<{ checkoutUrl: string }> => {
     const secretKey = process.env.STRIPE_SECRET_KEY;
     const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
 
@@ -27,20 +29,21 @@ export const createSubscriptionCheckout = action({
       throw new Error("Stripe not configured. Set STRIPE_SECRET_KEY in Convex environment variables.");
     }
 
-    const amountSen = amountForMonths(months);
+    const amount = amountForMonths(months);
     const label = months === 1 ? "1 month" : `${months} months`;
+    const isMYR = currency === "myr";
 
     const body = new URLSearchParams({
-      "line_items[0][price_data][currency]": "myr",
+      "line_items[0][price_data][currency]": currency,
       "line_items[0][price_data][product_data][name]": `GoPeek Publish — ${label}`,
       "line_items[0][price_data][product_data][description]":
         `Custom username, no GoPeek badge, analytics. Valid for ${label}.`,
-      "line_items[0][price_data][unit_amount]": String(amountSen),
+      "line_items[0][price_data][unit_amount]": String(amount),
       "line_items[0][quantity]": "1",
       mode: "payment",
       customer_email: email,
       "payment_method_types[0]": "card",
-      "payment_method_types[1]": "fpx",
+      ...(isMYR && { "payment_method_types[1]": "fpx" }),
       allow_promotion_codes: "true",
       "metadata[profileId]": profileId,
       "metadata[tier]": "publish",

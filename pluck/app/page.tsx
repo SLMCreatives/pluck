@@ -3,6 +3,7 @@
 // ============================================================
 import Link from "next/link";
 import Image from "next/image";
+import { headers } from "next/headers";
 import { SiteHeader } from "@/components/site-header";
 import { MockupHero } from "@/components/mockup-hero";
 
@@ -33,85 +34,89 @@ const features = [
   }
 ];
 
-const steps = [
-  {
-    title: "The Brain Dump",
-    desc: "Answer a few prompts about your experience and skills (Typeform style).",
-    step: "01"
-  },
-  {
-    title: "The Content Drop",
-    desc: "Upload your best work. We automatically format your galleries and videos.",
-    step: "02"
-  },
-  {
-    title: "The Live Preview",
-    desc: "See exactly how your site looks on a phone and desktop instantly.",
-    step: "03"
-  },
-  {
-    title: "Go Live",
-    desc: "Your profile publishes instantly on the Free plan. Upgrade to Publish (from RM 19, one-time) for a custom username and unlimited content.",
-    step: "04"
-  }
-];
+function getSteps(cur: string) {
+  return [
+    {
+      title: "The Brain Dump",
+      desc: "Answer a few prompts about your experience and skills (Typeform style).",
+      step: "01"
+    },
+    {
+      title: "The Content Drop",
+      desc: "Upload your best work. We automatically format your galleries and videos.",
+      step: "02"
+    },
+    {
+      title: "The Live Preview",
+      desc: "See exactly how your site looks on a phone and desktop instantly.",
+      step: "03"
+    },
+    {
+      title: "Go Live",
+      desc: `Your profile publishes instantly on the Free plan. Upgrade to Publish (from ${cur} 19, one-time) for a custom username and unlimited content.`,
+      step: "04"
+    }
+  ];
+}
 
-const pricingTiers = [
-  {
-    name: "Free",
-    price: "RM 0",
-    period: "",
-    description: "Build and go live — no credit card required.",
-    features: [
-      "3 blocks, 3 projects (tabs)",
-      "6 images total",
-      "Auto-generated public URL",
-      "Basic lead capture (WhatsApp / Email)",
-      "Basic themes only",
-      "No analytics",
-      "GoPeek badge on profile",
-    ],
-    cta: "Start Building",
-    ctaHref: "/startup",
-    highlight: false,
-    badge: null,
-  },
-  {
-    name: "Publish",
-    price: "from RM 19",
-    period: "",
-    description: "One-time payment. Pick 1, 3, 6, or 12 months.",
-    features: [
-      "Unlimited blocks, projects & images",
-      "Custom username (gopeek.my/yourname)",
-      "No GoPeek badge",
-      "Enhanced lead capture",
-      "Basic analytics (view count)",
-    ],
-    cta: "See Publish Plans",
-    ctaHref: "/pricing",
-    highlight: true,
-    badge: "Most popular",
-  },
-  {
-    name: "Pro",
-    price: "Coming soon",
-    period: "",
-    description: "Custom domain and advanced analytics.",
-    features: [
-      "Everything in Publish",
-      "Premium themes",
-      "Custom domain (yourname.com)",
-      "Advanced analytics",
-      "Multiple portfolios",
-      "Priority support",
-    ],
-    cta: "Notify Me",
-    ctaHref: "/pricing",
-    highlight: false,
-    badge: null,
-  },
-];
+function getPricingTiers(cur: string) {
+  return [
+    {
+      name: "Free",
+      price: `${cur} 0`,
+      period: "",
+      description: "Build and go live — no credit card required.",
+      features: [
+        "3 blocks, 3 projects (tabs)",
+        "6 images total",
+        "Auto-generated public URL",
+        "Basic lead capture (WhatsApp / Email)",
+        "Basic themes only",
+        "No analytics",
+        "GoPeek badge on profile",
+      ],
+      cta: "Start Building",
+      ctaHref: "/startup",
+      highlight: false,
+      badge: null,
+    },
+    {
+      name: "Publish",
+      price: `from ${cur} 19`,
+      period: "",
+      description: "One-time payment. Pick 1, 3, 6, or 12 months.",
+      features: [
+        "Unlimited blocks, projects & images",
+        "Custom username (gopeek.my/yourname)",
+        "No GoPeek badge",
+        "Enhanced lead capture",
+        "Basic analytics (view count)",
+      ],
+      cta: "See Publish Plans",
+      ctaHref: "/pricing",
+      highlight: true,
+      badge: "Most popular",
+    },
+    {
+      name: "Pro",
+      price: "Coming soon",
+      period: "",
+      description: "Custom domain and advanced analytics.",
+      features: [
+        "Everything in Publish",
+        "Premium themes",
+        "Custom domain (yourname.com)",
+        "Advanced analytics",
+        "Multiple portfolios",
+        "Priority support",
+      ],
+      cta: "Notify Me",
+      ctaHref: "/pricing",
+      highlight: false,
+      badge: null,
+    },
+  ];
+}
 
 const faqs = [
   {
@@ -138,6 +143,24 @@ const faqs = [
     q: "Do I need design skills to use GoPeek?",
     a: "Not at all. GoPeek's structured layout system automatically formats everything you upload — galleries, videos, project descriptions — so it always looks polished and professional, on every screen."
   }
+];
+
+const testimonials = [
+  {
+    quote: "Took me less than 10 minutes. I sent the link to a client the same day and got a reply within the hour.",
+    name: "Amirah R.",
+    role: "Graphic designer, KL",
+  },
+  {
+    quote: "I kept putting off building a website for two years. GoPeek got me live in one lunch break.",
+    name: "Faiz H.",
+    role: "Video editor & content creator",
+  },
+  {
+    quote: "The WhatsApp contact button alone is worth it. Clients message me directly from my portfolio link.",
+    name: "Siti N.",
+    role: "Freelance copywriter, Penang",
+  },
 ];
 
 const jsonLd = {
@@ -196,7 +219,17 @@ const jsonLd = {
   ],
 };
 
-export default function Page() {
+export default async function Page() {
+  const h = await headers();
+  const country = (
+    h.get("x-vercel-ip-country") ??
+    h.get("cf-ipcountry") ??
+    "MY"
+  ).toUpperCase();
+  const cur = country === "MY" ? "RM" : "$";
+  const steps = getSteps(cur);
+  const pricingTiers = getPricingTiers(cur);
+
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-zinc-900 via-black to-black text-white">
       <script
@@ -231,13 +264,19 @@ export default function Page() {
               <SecondaryCTA href="#pricing">See pricing</SecondaryCTA>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-400">
-              <span className="inline-flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                No design skills required
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-zinc-400">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                No credit card required
               </span>
-              <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline">Custom URL from RM 19</span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                No auto-renewal
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                FPX &amp; card supported
+              </span>
             </div>
           </div>
 
@@ -330,7 +369,7 @@ export default function Page() {
                 </li>
                 <li className="flex gap-3">
                   <Check />
-                  Free to build and go live. Custom URL from RM 19 (one-time).
+                  Free to build and go live. Custom URL from {cur} 19 (one-time).
                 </li>
               </ul>
 
@@ -339,6 +378,33 @@ export default function Page() {
               </div>
             </Card>
           </div>
+        </div>
+      </section>
+
+      {/* SOCIAL PROOF */}
+      <section className="mx-auto max-w-6xl px-6 py-14">
+        <SectionHeader
+          kicker="Early users"
+          title="Freelancers already using GoPeek."
+          subtitle="Real feedback from our beta community."
+        />
+        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          {testimonials.map((t) => (
+            <Card key={t.name} className="p-6">
+              <p className="text-sm leading-relaxed text-zinc-300">
+                &ldquo;{t.quote}&rdquo;
+              </p>
+              <div className="mt-4 flex items-center gap-3">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-sm font-bold text-white">
+                  {t.name[0]}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{t.name}</p>
+                  <p className="text-xs text-zinc-500">{t.role}</p>
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
       </section>
 
@@ -375,7 +441,7 @@ export default function Page() {
         <SectionHeader
           kicker="Pricing"
           title="Build free. Publish when you're ready."
-          subtitle="No surprise fees. Cancel anytime. Your profile, your timeline."
+          subtitle="No recurring charges. No auto-renewal. Your content stays yours forever."
         />
 
         <div className="mt-10 grid gap-5 sm:grid-cols-3">
@@ -463,7 +529,7 @@ export default function Page() {
               </Link>
             </div>
             <p className="text-xs text-zinc-500">
-              No credit card required to start • Publish from RM 19 (one-time)
+              No credit card required • FPX &amp; card accepted • No auto-renewal • Your content stays yours
             </p>
           </div>
         </div>
