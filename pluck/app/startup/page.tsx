@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -207,8 +208,8 @@ export default function StartupPage() {
       {/* Header */}
       <header className="flex items-center justify-between border-b border-white/8 px-6 py-4">
         <div className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/10 text-xs font-bold">P</span>
-          <span className="text-sm font-semibold">GoPeek</span>
+          <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek" className="rounded-xl object-contain" />
+          <Image src="/gopeek_logo_text.png" width={72} height={20} alt="GoPeek" className="object-contain" />
         </div>
 
         {/* Step progress — desktop */}

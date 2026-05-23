@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMutation, useQuery } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
@@ -157,10 +158,8 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-zinc-950 text-white">
       <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
         <div className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold">
-            P
-          </span>
-          <span className="text-sm font-semibold">GoPeek</span>
+          <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek" className="rounded-xl object-contain" />
+          <Image src="/gopeek_logo_text.png" width={72} height={20} alt="GoPeek" className="object-contain" />
         </div>
         <button
           onClick={() => signOut()}

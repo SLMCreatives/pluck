@@ -2,6 +2,7 @@
 // app/page.tsx
 // ============================================================
 import Link from "next/link";
+import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
 import { MockupHero } from "@/components/mockup-hero";
 
@@ -50,7 +51,7 @@ const steps = [
   },
   {
     title: "Go Live",
-    desc: "Your profile publishes instantly on the Free plan. Upgrade to Publish from RM 19 for a custom username and unlimited content.",
+    desc: "Your profile publishes instantly on the Free plan. Upgrade to Publish (from RM 19, one-time) for a custom username and unlimited content.",
     step: "04"
   }
 ];
@@ -66,6 +67,8 @@ const pricingTiers = [
       "6 images total",
       "Auto-generated public URL",
       "Basic lead capture (WhatsApp / Email)",
+      "Basic themes only",
+      "No analytics",
       "GoPeek badge on profile",
     ],
     cta: "Start Building",
@@ -75,9 +78,9 @@ const pricingTiers = [
   },
   {
     name: "Publish",
-    price: "RM 19",
-    period: "/mo",
-    description: "Custom username and no GoPeek badge.",
+    price: "from RM 19",
+    period: "",
+    description: "One-time payment. Pick 1, 3, 6, or 12 months.",
     features: [
       "Unlimited blocks, projects & images",
       "Custom username (gopeek.my/yourname)",
@@ -85,24 +88,25 @@ const pricingTiers = [
       "Enhanced lead capture",
       "Basic analytics (view count)",
     ],
-    cta: "Upgrade to Publish",
+    cta: "See Publish Plans",
     ctaHref: "/pricing",
     highlight: true,
     badge: "Most popular",
   },
   {
     name: "Pro",
-    price: "RM 39",
-    period: "/mo",
+    price: "Coming soon",
+    period: "",
     description: "Custom domain and advanced analytics.",
     features: [
       "Everything in Publish",
+      "Premium themes",
       "Custom domain (yourname.com)",
       "Advanced analytics",
       "Multiple portfolios",
       "Priority support",
     ],
-    cta: "Upgrade to Pro",
+    cta: "Notify Me",
     ctaHref: "/pricing",
     highlight: false,
     badge: null,
@@ -112,15 +116,15 @@ const pricingTiers = [
 const faqs = [
   {
     q: "Is Free really free forever?",
-    a: "Yes. You can build your full portfolio, go live with an auto-generated URL, and share it — completely free. You only pay if you want a custom username or advanced features."
+    a: "Yes. You can build your full portfolio, go live with an auto-generated URL, and share it — completely free. You only pay if you want a custom username, analytics, or premium features."
   },
   {
     q: "What's the difference between Free and Publish?",
-    a: "Publish (RM 19/mo or RM 149/yr) gives you a custom username (gopeek.my/yourname), removes the GoPeek badge, and includes basic analytics. Pro — with custom domains and advanced analytics — is coming soon."
+    a: "Publish gives you a custom username (gopeek.my/yourname), removes the GoPeek badge, unlocks basic analytics, and lifts all content limits. It's a one-time payment — choose 1 month (RM 19), 3 months (RM 54), 6 months (RM 99), or 12 months (RM 180). No recurring charges."
   },
   {
-    q: "Can I cancel anytime?",
-    a: "Yes. There are no contracts or lock-in periods. Cancel from your billing portal at any time. Your profile will stay live on the Free plan — you just lose the custom username and premium features."
+    q: "What happens when my Publish plan expires?",
+    a: "Your profile reverts to the Free tier — your content is safe but your custom username and premium features are paused until you renew. Renewing before expiry extends from your current end date."
   },
   {
     q: "Do I need to be a designer to make it look good?",
@@ -164,7 +168,7 @@ export default function Page() {
                 No design skills required
               </span>
               <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline">Custom URL from RM 19/mo</span>
+              <span className="hidden sm:inline">Custom URL from RM 19</span>
             </div>
           </div>
 
@@ -257,7 +261,7 @@ export default function Page() {
                 </li>
                 <li className="flex gap-3">
                   <Check />
-                  Free to build and go live. Custom URL from RM 19/mo.
+                  Free to build and go live. Custom URL from RM 19 (one-time).
                 </li>
               </ul>
 
@@ -312,7 +316,7 @@ export default function Page() {
               className={`relative flex flex-col rounded-3xl border p-8 ${
                 tier.highlight
                   ? "border-indigo-500 bg-indigo-500/5"
-                  : "border-white/10 bg-white/[0.03]"
+                  : "border-white/10 bg-white/3"
               }`}
             >
               {tier.badge && (
@@ -358,13 +362,13 @@ export default function Page() {
         </div>
 
         <p className="mt-6 text-center text-xs text-zinc-500">
-          All plans include unlimited profile edits. Paid plans billed monthly. Cancel anytime.
+          All plans include unlimited profile edits. Publish is a one-time payment — no recurring charges.
         </p>
       </section>
 
       {/* CTA BANNER */}
       <section id="start" className="mx-auto max-w-6xl px-6 py-14">
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-8 sm:p-10">
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/4 p-8 sm:p-10">
           <div className="pointer-events-none absolute inset-0 opacity-40">
             <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-indigo-500 blur-3xl" />
             <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-emerald-500 blur-3xl" />
@@ -390,7 +394,7 @@ export default function Page() {
               </Link>
             </div>
             <p className="text-xs text-zinc-500">
-              No credit card required to start • Publish from RM 9/mo
+              No credit card required to start • Publish from RM 19 (one-time)
             </p>
           </div>
         </div>
@@ -408,7 +412,7 @@ export default function Page() {
           {faqs.map((item) => (
             <details
               key={item.q}
-              className="group rounded-2xl border border-white/10 bg-white/[0.03] p-6 open:bg-white/[0.05]"
+              className="group rounded-2xl border border-white/10 bg-white/3 p-6 open:bg-white/5"
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
                 <span className="text-sm font-semibold">{item.q}</span>
@@ -438,24 +442,22 @@ function SiteFooter() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-sm text-zinc-400">
-            <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold text-white">
-              P
-            </span>
+            <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek" className="rounded-xl object-contain" />
             <span>
               © {new Date().getFullYear()} GoPeek. All rights reserved.
             </span>
           </div>
           <div className="flex gap-5 text-sm text-zinc-400">
-            <Link className="hover:text-white" href="#">
+            <Link className="hover:text-white transition" href="/privacy">
               Privacy
             </Link>
-            <Link className="hover:text-white" href="#">
+            <Link className="hover:text-white transition" href="/terms">
               Terms
             </Link>
-            <Link className="hover:text-white" href="#pricing">
+            <Link className="hover:text-white transition" href="#pricing">
               Pricing
             </Link>
-            <Link className="hover:text-white" href="/startup">
+            <Link className="hover:text-white transition" href="/startup">
               Build
             </Link>
           </div>
@@ -542,7 +544,7 @@ function Card({
   return (
     <div
       className={
-        "rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] " +
+        "rounded-3xl border border-white/10 bg-white/3 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] " +
         className
       }
     >
@@ -562,8 +564,8 @@ function Check() {
 function Glow() {
   return (
     <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      <div className="absolute left-1/2 top-8 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-indigo-500/30 blur-3xl" />
-      <div className="absolute right-0 top-40 h-[420px] w-[420px] rounded-full bg-fuchsia-500/20 blur-3xl" />
+      <div className="absolute left-1/2 top-8 h-105 w-105 -translate-x-1/2 rounded-full bg-indigo-500/30 blur-3xl" />
+      <div className="absolute right-0 top-40 h-105 w-105 rounded-full bg-fuchsia-500/20 blur-3xl" />
     </div>
   );
 }

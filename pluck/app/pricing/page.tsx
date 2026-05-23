@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -31,7 +32,7 @@ const PUBLISH_FEATURES = [
   "No GoPeek badge",
   "Enhanced lead capture",
   "Basic analytics (view count)",
-  "Premium themes",
+  "Premium themes (Pro)",
 ];
 
 const PRO_FEATURES = [
@@ -79,10 +80,8 @@ export default function PricingPage() {
     <div className="min-h-screen bg-zinc-950 text-white">
       <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold">
-            P
-          </span>
-          <span className="text-sm font-semibold">GoPeek</span>
+          <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek" className="rounded-xl object-contain" />
+          <Image src="/gopeek_logo_text.png" width={72} height={20} alt="GoPeek" className="object-contain" />
         </Link>
       </header>
 

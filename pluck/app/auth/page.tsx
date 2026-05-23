@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -36,10 +37,8 @@ export default function AuthPage() {
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-white/10 text-sm font-semibold">
-            P
-          </span>
-          <span className="text-sm font-semibold tracking-tight">GoPeek</span>
+          <Image src="/GoPeek.png" width={36} height={36} alt="GoPeek" className="rounded-xl object-contain" />
+          <Image src="/gopeek_logo_text.png" width={80} height={22} alt="GoPeek" className="object-contain" />
         </div>
 
         <div className="space-y-2">

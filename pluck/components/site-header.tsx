@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Menu, X, LayoutDashboard } from "lucide-react";
@@ -24,10 +25,8 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-white/10 text-sm font-semibold">
-            P
-          </span>
-          <span className="text-sm font-semibold tracking-tight">GoPeek</span>
+          <Image src="/GoPeek.png" width={36} height={36} alt="GoPeek" className="rounded-xl object-contain" />
+          <Image src="/gopeek_logo_text.png" width={80} height={22} alt="GoPeek" className="object-contain" />
         </Link>
 
         {/* Desktop nav */}
