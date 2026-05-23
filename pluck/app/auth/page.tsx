@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -50,10 +51,19 @@ function AuthContent() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-black px-6 text-white">
       <div className="w-full max-w-sm space-y-8">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
-          <Image src="/GoPeek.png" width={36} height={36} alt="GoPeek logo" className="rounded-xl object-contain" />
-          <Image src="/gopeek_logo_text.png" width={80} height={22} alt="GoPeek" className="object-contain" />
+        {/* Logo + back link */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Image src="/GoPeek.png" width={36} height={36} alt="GoPeek logo" className="rounded-xl object-contain" />
+            <Image src="/gopeek_logo_text.png" width={80} height={22} alt="GoPeek" className="object-contain" />
+          </div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-white/10 hover:text-white"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Home
+          </Link>
         </div>
 
         <div className="space-y-2">

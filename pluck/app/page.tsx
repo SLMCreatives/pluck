@@ -321,8 +321,8 @@ export default async function Page() {
 
         <div className="mt-10 grid gap-6 lg:grid-cols-12 lg:items-start">
           {/* Photo card */}
-          <div className="lg:col-span-3">
-            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/3">
+          <div className="flex justify-center lg:block lg:col-span-3">
+            <div className="w-3/4 lg:w-full overflow-hidden rounded-3xl border border-white/10 bg-white/3">
               <Image
                 src="/sulaiman.jpg"
                 alt="Sulaiman — Founder of GoPeek"
