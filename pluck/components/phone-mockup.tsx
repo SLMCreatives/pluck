@@ -10,7 +10,7 @@ interface PhoneMockupProps {
 
 export function PhoneMockup({ data, activeTab }: PhoneMockupProps) {
   return (
-    <div className="flex items-center justify-center min-h-screen  sticky top-0">
+    <div className="flex items-center justify-center min-h-[calc(100vh-57px)] sticky top-0">
       {/* Ambient glow like landing page */}
       {/*  <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-[-140px] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl" />
