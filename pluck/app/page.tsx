@@ -314,67 +314,89 @@ export default async function Page() {
       {/* FOUNDER STORY */}
       <section id="story" className="mx-auto max-w-6xl px-6 py-14">
         <SectionHeader
-          kicker="The Heart"
-          title="Built for the after-hours hustlers."
-          subtitle="Because your work deserves more than dead links and random PDFs."
+          kicker="The Story"
+          title="Built from frustration. Launched with purpose."
+          subtitle="A Malaysian freelancer got tired of sending dead links — so he built the fix."
         />
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <Card className="p-7">
-              <blockquote className="text-pretty text-base leading-relaxed text-zinc-200">
-                <span className="text-zinc-400">"</span>I spent 8 hours a day in
-                a corporate office, but my real passion was{" "}
-                <span className="font-semibold text-white">
-                  [Design/Consulting/Coding]
-                </span>{" "}
-                on the side. When a big client asked for my work, I realized I
-                had nothing professional to show them—just a bunch of PDFs and
-                dead links. I didn't have time to master a complex website
-                builder. I needed something fast, cheap, and mobile-friendly.
-                <span className="block" />
-                <span className="mt-4 block">
-                  So, I built{" "}
-                  <span className="font-semibold text-white">GoPeek</span> for all
-                  of us who are hustling between meetings to build something of
-                  our own.
-                </span>
-                <span className="text-zinc-400">"</span>
-              </blockquote>
-              <div className="mt-6 flex items-center justify-between gap-4">
-                <div className="text-sm text-zinc-400">— Founder, GoPeek</div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
-                  Fast • Affordable • Mobile-first
-                </span>
+        <div className="mt-10 grid gap-6 lg:grid-cols-12 lg:items-start">
+          {/* Photo card */}
+          <div className="lg:col-span-3">
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/3">
+              <Image
+                src="/sulaiman.jpg"
+                alt="Sulaiman — Founder of GoPeek"
+                width={400}
+                height={400}
+                className="w-full object-cover"
+                priority
+              />
+              <div className="px-5 py-4">
+                <p className="font-semibold text-white">Sulaiman</p>
+                <p className="mt-0.5 text-xs text-zinc-400">Founder, GoPeek</p>
+                <div className="mt-3 flex items-center gap-3">
+                  <a
+                    href="https://slmcreatives.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-zinc-400 transition hover:text-white"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    Website
+                  </a>
+                  <span className="text-white/10">|</span>
+                  <a
+                    href="https://www.linkedin.com/in/sulaiman-shafiq-208054193/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-zinc-400 transition hover:text-white"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                    LinkedIn
+                  </a>
+                </div>
               </div>
-            </Card>
+            </div>
           </div>
 
-          <div className="lg:col-span-5">
-            <Card className="p-7">
-              <h3 className="text-base font-semibold">The vibe</h3>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-300">
-                You are not trying to build a &quot;website.&quot; You are
-                trying to win the next client.
-              </p>
-              <ul className="mt-5 space-y-3 text-sm text-zinc-300">
-                <li className="flex gap-3">
-                  <Check />
-                  Clean layout that makes your work pop.
-                </li>
-                <li className="flex gap-3">
-                  <Check />
-                  Built-in lead capture with WhatsApp/Email.
-                </li>
-                <li className="flex gap-3">
-                  <Check />
-                  Free to build and go live. Custom URL from {cur} 19 (one-time).
-                </li>
-              </ul>
+          {/* Story card */}
+          <div className="lg:col-span-9">
+            <Card className="p-7 h-full">
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">In his own words</p>
+              <blockquote className="mt-4 space-y-4 text-pretty text-base leading-relaxed text-zinc-200">
+                <p>
+                  <span className="text-2xl leading-none text-zinc-500">&ldquo;</span>I know what it feels
+                  like to hustle for clients and have absolutely nothing clean to show them.
+                  A potential client would ask — <span className="font-semibold text-white">&ldquo;Can I see your work?&rdquo;</span> — and
+                  I&apos;d scramble to find a Google Drive link, a half-broken PDF, or
+                  a project buried in my phone gallery.
+                </p>
+                <p>
+                  It was embarrassing. Not because the work wasn&apos;t good — but because
+                  I had no proper way to present it. I didn&apos;t have time or money to
+                  hire a web designer. And every portfolio builder I tried either
+                  looked generic, cost too much, or took hours to figure out.
+                </p>
+                <p>
+                  So I built <span className="font-semibold text-white">GoPeek</span> for
+                  myself first — and then for every Malaysian freelancer who&apos;s ever
+                  lost a client simply because they couldn&apos;t show their work fast enough.
+                  <span className="text-2xl leading-none text-zinc-500">&rdquo;</span>
+                </p>
+              </blockquote>
 
-              <div className="mt-6">
-                <SecondaryCTA href="/startup">Try it in 5 minutes</SecondaryCTA>
+              <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap gap-2">
+                  {["Freelancer first", "Built in Malaysia", "Launched in 2025"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-400"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <SecondaryCTA href="/startup">Build yours free</SecondaryCTA>
               </div>
             </Card>
           </div>
