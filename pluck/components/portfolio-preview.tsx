@@ -224,7 +224,7 @@ export function PortfolioPreview({ data, activeTab, showBadge = true }: Portfoli
               <span className="grid h-5 w-5 place-items-center rounded-lg bg-white/10 text-[10px] font-bold text-white">
                 P
               </span>
-              Built with Peek
+              Built with GoPeek
             </Link>
           </div>
         </div>

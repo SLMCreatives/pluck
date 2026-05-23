@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Peek — Build your portfolio in 5 minutes",
+  title: "GoPeek — Build your portfolio in 5 minutes",
   description:
     "Mobile-first portfolio builder for freelancers and side-hustlers."
 };

@@ -32,9 +32,9 @@ export const createSubscriptionCheckout = action({
 
     const body = new URLSearchParams({
       "line_items[0][price_data][currency]": "myr",
-      "line_items[0][price_data][product_data][name]": `Peek Publish — ${label}`,
+      "line_items[0][price_data][product_data][name]": `GoPeek Publish — ${label}`,
       "line_items[0][price_data][product_data][description]":
-        `Custom username, no Peek badge, analytics. Valid for ${label}.`,
+        `Custom username, no GoPeek badge, analytics. Valid for ${label}.`,
       "line_items[0][price_data][unit_amount]": String(amountSen),
       "line_items[0][quantity]": "1",
       mode: "payment",

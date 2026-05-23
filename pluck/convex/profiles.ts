@@ -247,7 +247,7 @@ export const saveProfile = mutation({
 });
 
 // Called by Stripe webhook after one-time checkout completes.
-export const activateSubscription = mutation({
+export const activateSubscription = internalMutation({
   args: {
     stripeCustomerId: v.optional(v.string()),
     tier: v.literal("publish"),

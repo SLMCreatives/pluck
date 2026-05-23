@@ -1,7 +1,7 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { auth } from "./auth";
-import { api } from "./_generated/api";
+import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
 const http = httpRouter();
@@ -63,7 +63,7 @@ http.route({
       const stripeCustomerId = session.customer as string | undefined;
 
       if (profileId && tier === "publish") {
-        await ctx.runMutation(api.profiles.activateSubscription, {
+        await ctx.runMutation(internal.profiles.activateSubscription, {
           profileId,
           tier,
           ...(stripeCustomerId ? { stripeCustomerId } : {}),

@@ -198,7 +198,7 @@ export default function EditProfilePage() {
                 </label>
                 <div className="flex h-11 items-center gap-0 overflow-hidden rounded-xl border border-white/10 bg-white/5 focus-within:border-white/30 transition-colors">
                   <span className="shrink-0 border-r border-white/10 bg-white/3 px-3 text-sm text-zinc-500">
-                    peek.com.my/
+                    gopeek.my/
                   </span>
                   <input
                     value={slug}
@@ -217,7 +217,7 @@ export default function EditProfilePage() {
                   Your URL
                 </label>
                 <div className="flex h-11 items-center overflow-hidden rounded-xl border border-white/10 bg-white/5 px-3">
-                  <span className="text-sm text-zinc-400">peek.com.my/{slug}</span>
+                  <span className="text-sm text-zinc-400">gopeek.my/{slug}</span>
                 </div>
                 <p className="text-xs text-zinc-500">
                   <a href="/pricing" className="text-indigo-400 hover:text-indigo-300 transition">Upgrade to Publish</a>{" "}
@@ -259,7 +259,7 @@ export default function EditProfilePage() {
       <header className="flex items-center justify-between border-b border-white/8 px-6 py-4">
         <div className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/10 text-xs font-bold">P</span>
-          <span className="text-sm font-semibold">Peek</span>
+          <span className="text-sm font-semibold">GoPeek</span>
         </div>
 
         {/* Step progress — desktop */}

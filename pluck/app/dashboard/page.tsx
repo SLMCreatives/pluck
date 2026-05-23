@@ -131,7 +131,7 @@ export default function DashboardPage() {
   const expiresAt = profile.subscriptionExpiresAt ?? null;
   const daysLeft = expiresAt ? daysUntil(expiresAt) : null;
   const isExpiringSoon = daysLeft !== null && daysLeft <= 7 && daysLeft > 0;
-  const publicUrl = `peek.com.my/${profile.slug}`;
+  const publicUrl = `gopeek.my/${profile.slug}`;
   const totalBlocks = data.tabs.reduce((n, t) => n + t.blocks.length, 0);
 
   const copyUrl = () => {
@@ -160,7 +160,7 @@ export default function DashboardPage() {
           <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold">
             P
           </span>
-          <span className="text-sm font-semibold">Peek</span>
+          <span className="text-sm font-semibold">GoPeek</span>
         </div>
         <button
           onClick={() => signOut()}
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-indigo-300">You&apos;re live on the Free plan</p>
                   <p className="mt-0.5 text-xs text-indigo-400/80">
-                    Upgrade to Publish for a custom username and no Peek badge.
+                    Upgrade to Publish for a custom username and no GoPeek badge.
                   </p>
                 </div>
                 <Button

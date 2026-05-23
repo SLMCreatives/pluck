@@ -208,7 +208,7 @@ export default function StartupPage() {
       <header className="flex items-center justify-between border-b border-white/8 px-6 py-4">
         <div className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/10 text-xs font-bold">P</span>
-          <span className="text-sm font-semibold">Peek</span>
+          <span className="text-sm font-semibold">GoPeek</span>
         </div>
 
         {/* Step progress — desktop */}

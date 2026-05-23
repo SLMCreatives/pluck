@@ -27,7 +27,7 @@ export function SiteHeader() {
           <span className="grid h-9 w-9 place-items-center rounded-2xl bg-white/10 text-sm font-semibold">
             P
           </span>
-          <span className="text-sm font-semibold tracking-tight">Peek</span>
+          <span className="text-sm font-semibold tracking-tight">GoPeek</span>
         </Link>
 
         {/* Desktop nav */}

@@ -64,7 +64,7 @@ export default function PaidPage({
         This usually takes a few seconds. Please don&apos;t close this tab.
       </p>
       {slug && (
-        <p className="font-mono text-sm text-zinc-500">peek.com.my/{slug}</p>
+        <p className="font-mono text-sm text-zinc-500">gopeek.my/{slug}</p>
       )}
     </Shell>
   );

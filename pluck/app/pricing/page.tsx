@@ -20,15 +20,15 @@ const FREE_FEATURES = [
   "6 images total",
   "Auto-generated public URL",
   "Basic lead capture (WhatsApp / Email)",
-  "Peek badge on profile",
+  "GoPeek badge on profile",
   "Basic themes only",
   "No analytics",
 ];
 
 const PUBLISH_FEATURES = [
   "Unlimited blocks, projects & images",
-  "Custom username (peek.com.my/yourname)",
-  "No Peek badge",
+  "Custom username (gopeek.my/yourname)",
+  "No GoPeek badge",
   "Enhanced lead capture",
   "Basic analytics (view count)",
   "Premium themes",
@@ -82,7 +82,7 @@ export default function PricingPage() {
           <span className="grid h-8 w-8 place-items-center rounded-2xl bg-white/10 text-xs font-semibold">
             P
           </span>
-          <span className="text-sm font-semibold">Peek</span>
+          <span className="text-sm font-semibold">GoPeek</span>
         </Link>
       </header>
 
@@ -147,7 +147,7 @@ export default function PricingPage() {
                   <span className="ml-2 font-semibold text-emerald-400">{selectedOption.savings}</span>
                 )}
               </p>
-              <p className="mt-2 text-sm text-zinc-400">Custom username and no Peek badge.</p>
+              <p className="mt-2 text-sm text-zinc-400">Custom username and no GoPeek badge.</p>
             </div>
 
             {/* Month selector */}

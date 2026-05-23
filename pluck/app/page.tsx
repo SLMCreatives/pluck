@@ -66,7 +66,7 @@ const pricingTiers = [
       "6 images total",
       "Auto-generated public URL",
       "Basic lead capture (WhatsApp / Email)",
-      "Peek badge on profile",
+      "GoPeek badge on profile",
     ],
     cta: "Start Building",
     ctaHref: "/startup",
@@ -77,11 +77,11 @@ const pricingTiers = [
     name: "Publish",
     price: "RM 19",
     period: "/mo",
-    description: "Custom username and no Peek badge.",
+    description: "Custom username and no GoPeek badge.",
     features: [
       "Unlimited blocks, projects & images",
-      "Custom username (peek.com.my/yourname)",
-      "No Peek badge",
+      "Custom username (gopeek.my/yourname)",
+      "No GoPeek badge",
       "Enhanced lead capture",
       "Basic analytics (view count)",
     ],
@@ -116,7 +116,7 @@ const faqs = [
   },
   {
     q: "What's the difference between Free and Publish?",
-    a: "Publish (RM 19/mo or RM 149/yr) gives you a custom username (peek.com.my/yourname), removes the Peek badge, and includes basic analytics. Pro — with custom domains and advanced analytics — is coming soon."
+    a: "Publish (RM 19/mo or RM 149/yr) gives you a custom username (gopeek.my/yourname), removes the GoPeek badge, and includes basic analytics. Pro — with custom domains and advanced analytics — is coming soon."
   },
   {
     q: "Can I cancel anytime?",
@@ -177,7 +177,7 @@ export default function Page() {
       {/* FEATURES */}
       <section id="features" className="mx-auto max-w-6xl px-6 py-14">
         <SectionHeader
-          kicker="Why Peek"
+          kicker="Why GoPeek"
           title="Everything you need to look premium — instantly."
           subtitle="Answer a few prompts, drop in your best work, and share a link that actually converts."
         />
@@ -223,14 +223,14 @@ export default function Page() {
                 <span className="block" />
                 <span className="mt-4 block">
                   So, I built{" "}
-                  <span className="font-semibold text-white">Peek</span> for all
+                  <span className="font-semibold text-white">GoPeek</span> for all
                   of us who are hustling between meetings to build something of
                   our own.
                 </span>
                 <span className="text-zinc-400">"</span>
               </blockquote>
               <div className="mt-6 flex items-center justify-between gap-4">
-                <div className="text-sm text-zinc-400">— Founder, Peek</div>
+                <div className="text-sm text-zinc-400">— Founder, GoPeek</div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">
                   <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
                   Fast • Affordable • Mobile-first
@@ -442,7 +442,7 @@ function SiteFooter() {
               P
             </span>
             <span>
-              © {new Date().getFullYear()} Peek. All rights reserved.
+              © {new Date().getFullYear()} GoPeek. All rights reserved.
             </span>
           </div>
           <div className="flex gap-5 text-sm text-zinc-400">

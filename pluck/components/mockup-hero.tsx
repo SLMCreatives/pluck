@@ -89,7 +89,7 @@ export function MockupHero() {
             <span className="h-3 w-3 rounded-full bg-green-400/60" />
           </div>
           <div className="rounded-md bg-white/5 px-4 py-1.5 text-[11px] font-medium text-zinc-400">
-            peek.com.my/aisha
+            gopeek.my/aisha
           </div>
           <div className="w-14" />
         </div>
