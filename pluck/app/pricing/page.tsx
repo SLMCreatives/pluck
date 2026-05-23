@@ -80,7 +80,7 @@ export default function PricingPage() {
     <div className="min-h-screen bg-zinc-950 text-white">
       <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek" className="rounded-xl object-contain" />
+          <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek logo" className="rounded-xl object-contain" />
           <Image src="/gopeek_logo_text.png" width={72} height={20} alt="GoPeek" className="object-contain" />
         </Link>
       </header>

@@ -37,7 +37,7 @@ export default function AuthPage() {
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <Image src="/GoPeek.png" width={36} height={36} alt="GoPeek" className="rounded-xl object-contain" />
+          <Image src="/GoPeek.png" width={36} height={36} alt="GoPeek logo" className="rounded-xl object-contain" />
           <Image src="/gopeek_logo_text.png" width={80} height={22} alt="GoPeek" className="object-contain" />
         </div>
 

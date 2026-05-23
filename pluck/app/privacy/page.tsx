@@ -16,7 +16,7 @@ export default function PrivacyPage() {
             href="/"
             className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition"
           >
-            <Image src="/GoPeek.png" width={28} height={28} alt="GoPeek" className="rounded-lg object-contain" />
+            <Image src="/GoPeek.png" width={28} height={28} alt="GoPeek logo" className="rounded-lg object-contain" />
             <Image src="/gopeek_logo_text.png" width={64} height={18} alt="GoPeek" className="object-contain" />
           </Link>
           <h1 className="mt-6 text-3xl font-bold tracking-tight">Privacy Policy</h1>

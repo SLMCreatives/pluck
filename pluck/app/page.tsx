@@ -115,26 +115,94 @@ const pricingTiers = [
 
 const faqs = [
   {
-    q: "Is Free really free forever?",
-    a: "Yes. You can build your full portfolio, go live with an auto-generated URL, and share it — completely free. You only pay if you want a custom username, analytics, or premium features."
+    q: "What is the best free portfolio builder for freelancers in Malaysia?",
+    a: "GoPeek is built specifically for Malaysian freelancers and side-hustlers. It's free to start, takes 5 minutes to set up, requires zero design skills, and gives you a mobile-first portfolio with built-in WhatsApp and email lead capture — all on a shareable gopeek.my link."
   },
   {
-    q: "What's the difference between Free and Publish?",
-    a: "Publish gives you a custom username (gopeek.my/yourname), removes the GoPeek badge, unlocks basic analytics, and lifts all content limits. It's a one-time payment — choose 1 month (RM 19), 3 months (RM 54), 6 months (RM 99), or 12 months (RM 180). No recurring charges."
+    q: "How do I create a professional portfolio in 5 minutes?",
+    a: "Sign up, fill in your name, title, and bio, add your best work, and hit publish. GoPeek handles all the layout and formatting automatically. No templates to fiddle with, no design decisions — just answer a few prompts and you're live."
+  },
+  {
+    q: "Is GoPeek a good Linktree alternative for Malaysian freelancers?",
+    a: "Yes — and it goes much deeper than Linktree. Instead of just a list of links, GoPeek gives you a full project portfolio with galleries, videos, and experience blocks. You also get built-in lead capture (WhatsApp / email) and a custom username like gopeek.my/yourname on the Publish plan."
+  },
+  {
+    q: "What's the difference between the Free and Publish plans?",
+    a: "Free lets you build and go live with an auto-generated URL — completely free, forever. Publish (from RM 19, one-time) gives you a custom username, removes the GoPeek badge, unlocks unlimited content and basic analytics. Choose 1 month (RM 19), 3 months (RM 54), 6 months (RM 99), or 12 months (RM 180). No recurring charges."
   },
   {
     q: "What happens when my Publish plan expires?",
-    a: "Your profile reverts to the Free tier — your content is safe but your custom username and premium features are paused until you renew. Renewing before expiry extends from your current end date."
+    a: "Your profile safely reverts to the Free tier — all your content stays intact, but your custom username and paid features are paused until you renew. Renewing before expiry extends from your current end date, not from the renewal date."
   },
   {
-    q: "Do I need to be a designer to make it look good?",
-    a: "Not at all. Our structured layout system ensures that no matter what you upload, it follows high-end design principles automatically."
+    q: "Do I need design skills to use GoPeek?",
+    a: "Not at all. GoPeek's structured layout system automatically formats everything you upload — galleries, videos, project descriptions — so it always looks polished and professional, on every screen."
   }
 ];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://gopeek.my/#app",
+      "name": "GoPeek",
+      "url": "https://gopeek.my",
+      "description": "Free portfolio builder for Malaysian freelancers. Build a professional mobile-first portfolio in 5 minutes with no design skills required.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "en-MY",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Free",
+          "price": "0",
+          "priceCurrency": "MYR",
+          "description": "Free forever. Build and go live with an auto-generated URL.",
+        },
+        {
+          "@type": "Offer",
+          "name": "Publish",
+          "price": "19",
+          "priceCurrency": "MYR",
+          "description": "Custom username, no badge, unlimited content, basic analytics. One-time payment.",
+        },
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://gopeek.my/#faq",
+      "mainEntity": faqs.map((item) => ({
+        "@type": "Question",
+        "name": item.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.a,
+        },
+      })),
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://gopeek.my/#org",
+      "name": "GoPeek",
+      "url": "https://gopeek.my",
+      "logo": "https://gopeek.my/GoPeek.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "info@slmcreatives.com",
+        "contactType": "customer support",
+      },
+    },
+  ],
+};
 
 export default function Page() {
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-zinc-900 via-black to-black text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <SiteHeader />
 
       {/* HERO */}
@@ -146,13 +214,14 @@ export default function Page() {
             <Badge>Mobile-first • 5-minute setup • Free to build</Badge>
 
             <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-              Your professional flex, built in 5 minutes.
+              The free portfolio builder for Malaysian freelancers.
             </h1>
 
             <p className="text-pretty text-base leading-relaxed text-zinc-300 sm:text-lg">
-              Stop sending messy folders. Create a high-converting, mobile-first
-              portfolio that turns leads into clients — free to build, publish
-              when you're ready.
+              Stop sending messy folders and dead links. Build a professional,
+              mobile-first portfolio in 5 minutes — no design skills needed.
+              Share one link, capture leads via WhatsApp or email, and win more
+              clients.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -442,7 +511,7 @@ function SiteFooter() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-sm text-zinc-400">
-            <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek" className="rounded-xl object-contain" />
+            <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek logo" className="rounded-xl object-contain" />
             <span>
               © {new Date().getFullYear()} GoPeek. All rights reserved.
             </span>
