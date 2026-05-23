@@ -141,18 +141,17 @@ export function PricingPageClient({ currency }: { currency: string }) {
               <p className="mt-2 flex items-end gap-1">
                 <span className="text-4xl font-bold">{currency} {selectedOption.price}</span>
                 <span className="mb-1 text-zinc-500">
-                  / {selectedMonths === 1 ? "mo" : `${selectedMonths} mo`}
+                  / {selectedMonths === 1 ? "1 month" : `${selectedMonths} months`}
                 </span>
               </p>
               <p className="mt-1 text-xs text-zinc-500">
-                {currency} {selectedOption.pricePerMonth}/mo
                 {selectedOption.savingsAmt !== null && (
-                  <span className="ml-2 font-semibold text-emerald-400">
+                  <span className="font-semibold text-emerald-400">
                     Save {currency} {selectedOption.savingsAmt}
                   </span>
                 )}
               </p>
-              <p className="mt-2 text-sm text-zinc-400">Custom username and no GoPeek badge.</p>
+              <p className="mt-2 text-sm text-zinc-400">One-time payment. No auto-renewal.</p>
             </div>
 
             {/* Month selector */}
@@ -233,7 +232,9 @@ export function PricingPageClient({ currency }: { currency: string }) {
         </div>
 
         <p className="mt-10 text-center text-sm text-zinc-500">
-          Pay once, stay live. Profile unpublishes when your period ends — renew anytime to stay live.
+          Pay once for your selected duration. No auto-renewal.
+          <br />
+          When your Publish period ends, your profile safely returns to the Free plan. Your content stays intact.
           <br />
           Supports credit card and FPX (online banking).
         </p>

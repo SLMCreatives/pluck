@@ -536,8 +536,8 @@ export default async function Page() {
               Ready to stop sending PDFs?
             </h2>
             <p className="max-w-lg text-sm leading-relaxed text-zinc-300 sm:text-base">
-              Build your portfolio for free. Preview it live. Upgrade to go
-              public when you feel good about it.
+              Build your portfolio for free and go live instantly. Upgrade
+              when you&apos;re ready for a custom username and more.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <PrimaryCTA href="/startup">
