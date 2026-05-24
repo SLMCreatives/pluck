@@ -46,6 +46,22 @@ function contactIcon(href: string) {
   return ArrowUpRight;
 }
 
+function normaliseSocialHref(platform: string, url: string): string {
+  const p = platform?.toLowerCase();
+  if (p === "email") {
+    return url.startsWith("mailto:") ? url : `mailto:${url}`;
+  }
+  if (p === "whatsapp") {
+    const digits = url.replace(/\D/g, "");
+    return url.includes("wa.me") ? url : `https://wa.me/${digits}`;
+  }
+  if (p === "phone") {
+    const digits = url.replace(/\D/g, "");
+    return url.startsWith("tel:") ? url : `tel:+${digits}`;
+  }
+  return url;
+}
+
 export function PortfolioPreview({ data, activeTab, showBadge = true }: PortfolioPreviewProps) {
   const initialTab = activeTab || data.tabs[0]?.id;
   const [selectedTabId, setSelectedTabId] = useState(initialTab);
@@ -154,11 +170,13 @@ export function PortfolioPreview({ data, activeTab, showBadge = true }: Portfoli
               .map((link, idx) => {
                 const Icon =
                   SOCIAL_ICONS[link.platform?.toLowerCase()] ?? Globe;
+                const href = normaliseSocialHref(link.platform, link.url);
+                const isNative = href.startsWith("mailto:") || href.startsWith("tel:");
                 return (
                   <a
                     key={idx}
-                    href={link.url}
-                    target="_blank"
+                    href={href}
+                    target={isNative ? "_self" : "_blank"}
                     rel="noopener noreferrer"
                     title={link.platform}
                     className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/5 text-zinc-400 transition hover:border-white/20 hover:bg-white/10 hover:text-white active:scale-95"

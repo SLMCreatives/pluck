@@ -244,17 +244,18 @@ export default async function Page() {
 
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div className="space-y-6">
-            <Badge>Mobile-first • 5-minute setup • Free to build</Badge>
+            <Badge>For Malaysian freelancers • 5-minute setup • Free to start</Badge>
 
             <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-              The free portfolio builder for Malaysian freelancers.
+              The fastest way to look professional before a client asks,{" "}
+              <span className="text-zinc-400">&ldquo;Can I see your work?&rdquo;</span>
             </h1>
 
             <p className="text-pretty text-base leading-relaxed text-zinc-300 sm:text-lg">
-              Stop sending messy folders and dead links. Build a professional,
-              mobile-first portfolio in 5 minutes — no design skills needed.
-              Share one link, capture leads via WhatsApp or email, and win more
-              clients.
+              GoPeek helps Malaysian freelancers build a client-ready portfolio
+              in 5 minutes — with WhatsApp lead capture and a clean
+              gopeek.my link. No design skills. No dead Google Drive folders.
+              Just one link that does the talking.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -290,8 +291,8 @@ export default async function Page() {
       <section id="features" className="mx-auto max-w-6xl px-6 py-14">
         <SectionHeader
           kicker="Why GoPeek"
-          title="Everything you need to look premium — instantly."
-          subtitle="Answer a few prompts, drop in your best work, and share a link that actually converts."
+          title="Everything a client needs to say yes — in one link."
+          subtitle="Answer a few prompts, drop in your best work, and share a gopeek.my link that actually converts."
         />
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -533,11 +534,12 @@ export default async function Page() {
 
           <div className="relative flex flex-col items-center gap-6 text-center">
             <h2 className="text-balance text-2xl font-semibold sm:text-3xl">
-              Ready to stop sending PDFs?
+              Next time a client asks — you&apos;ll be ready.
             </h2>
             <p className="max-w-lg text-sm leading-relaxed text-zinc-300 sm:text-base">
-              Build your portfolio for free and go live instantly. Upgrade
-              when you&apos;re ready for a custom username and more.
+              Build your portfolio for free and go live instantly. Share one
+              clean gopeek.my link — with your work, your story, and a
+              WhatsApp button that brings clients straight to you.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <PrimaryCTA href="/startup">
