@@ -40,8 +40,9 @@ export function PhoneMockup({ data, activeTab }: PhoneMockupProps) {
             {/* subtle inner border like glass */}
             <div className="pointer-events-none absolute inset-0 z-10 ring-1 ring-white/10 rounded-[2.75rem]" />
 
-            {/* Scroll container */}
-            <div className="absolute inset-0 overflow-y-auto overscroll-contain scrollbar-hide">
+            {/* Scroll container — transform-gpu creates a new containing block so
+                fixed-position children inside PortfolioPreview stay inside the phone frame */}
+            <div className="absolute inset-0 overflow-y-auto overscroll-contain scrollbar-hide transform-gpu">
               <PortfolioPreview data={data} activeTab={activeTab} />
             </div>
 
