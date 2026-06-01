@@ -18,10 +18,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "GoPeek — Free Portfolio Builder for Malaysian Freelancers",
   description:
-    "Build a professional mobile-first portfolio in 5 minutes. Free to start, no design skills needed. The fastest way for Malaysian freelancers and side-hustlers to share their work and win clients.",
+    "Build a professional mobile-first portfolio in 5 minutes — free forever, no credit card needed. WhatsApp lead capture, a shareable gopeek.my link, and zero design skills required. Built for Malaysian freelancers.",
   keywords: [
     "portfolio builder Malaysia",
     "free portfolio website Malaysia",
+    "free portfolio forever Malaysia",
     "online portfolio for freelancers Malaysia",
     "mobile portfolio builder",
     "freelancer profile link Malaysia",
@@ -30,13 +31,17 @@ export const metadata: Metadata = {
     "Linktree alternative Malaysia",
     "share work portfolio link",
     "portfolio with WhatsApp contact",
+    "gopeek",
+    "gopeek.my",
+    "freelancer portfolio Malaysia",
+    "how to build portfolio Malaysia",
   ],
   metadataBase: new URL("https://gopeek.my"),
   alternates: { canonical: "/" },
   openGraph: {
     title: "GoPeek — Free Portfolio Builder for Malaysian Freelancers",
     description:
-      "Build a professional mobile-first portfolio in 5 minutes. Free to start, no design skills needed.",
+      "Build a professional mobile-first portfolio in 5 minutes — free forever. WhatsApp lead capture, shareable gopeek.my link, zero design skills required.",
     url: "https://gopeek.my",
     siteName: "GoPeek",
     locale: "en_MY",
@@ -54,7 +59,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "GoPeek — Free Portfolio Builder for Malaysian Freelancers",
     description:
-      "Build a professional mobile-first portfolio in 5 minutes. Free to start, no design skills needed.",
+      "Build a professional mobile-first portfolio in 5 minutes — free forever. WhatsApp lead capture, shareable gopeek.my link, zero design skills required.",
     images: ["/GoPeek.png"],
   },
   robots: {

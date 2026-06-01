@@ -4,15 +4,11 @@ import {
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
 
-const isProtected = createRouteMatcher(["/startup(.*)", "/dashboard(.*)"]);
-const isStartup = createRouteMatcher(["/startup(.*)"]);
+const isProtected = createRouteMatcher(["/dashboard(.*)"]);
 
 export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
   if (isProtected(request) && !(await convexAuth.isAuthenticated())) {
-    return nextjsMiddlewareRedirect(
-      request,
-      isStartup(request) ? "/auth?mode=signup" : "/auth"
-    );
+    return nextjsMiddlewareRedirect(request, "/auth");
   }
 });
 

@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery, useConvexAuth } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "@/convex/_generated/api";
 import type { PortfolioData, Tab, BlockType, ContentBlock } from "@/types/portfolio";
 import { PhoneMockup } from "@/components/phone-mockup";
+import { PortfolioPreview } from "@/components/portfolio-preview";
 import { StepOnboarding } from "@/components/wizard/step-onboarding";
 import { StepSocial } from "@/components/wizard/step-social";
 import { StepBlocks } from "@/components/wizard/step-blocks";
@@ -16,6 +18,8 @@ import { StepTabs } from "@/components/wizard/step-tabs";
 import { Button } from "@/components/ui/button";
 import { LogOut, Check } from "lucide-react";
 import { FREE_LIMITS, countTotalBlocks, countTotalImages } from "@/lib/limits";
+
+const STORAGE_KEY = "pluck_pending_portfolio";
 
 type WizardStep = "onboarding" | "social" | "tabs" | "blocks" | "block-form" | "preview";
 
@@ -45,14 +49,32 @@ export default function StartupPage() {
   const saveProfile = useMutation(api.profiles.saveProfile);
   const { signOut } = useAuthActions();
   const router = useRouter();
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const existingProfile = useQuery(api.profiles.getMyProfile);
 
+  // After signing up, restore pending portfolio data and jump to preview
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const pending = sessionStorage.getItem(STORAGE_KEY);
+    if (!pending) return;
+    try {
+      const data = JSON.parse(pending) as PortfolioData;
+      setPortfolioData(data);
+      setStep("preview");
+    } catch {
+      // ignore corrupt data
+    } finally {
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+  }, [isAuthenticated]);
+
+  // Redirect to dashboard if the user already has a profile
   useEffect(() => {
     if (existingProfile) router.replace("/dashboard");
   }, [existingProfile, router]);
 
-  // Still loading — don't flash the wizard
-  if (existingProfile === undefined) {
+  // Show spinner while auth is initialising or while checking for an existing profile
+  if (isAuthLoading || (isAuthenticated && existingProfile === undefined)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
         <div className="h-7 w-7 animate-spin rounded-full border-2 border-white/20 border-t-white" />
@@ -60,7 +82,7 @@ export default function StartupPage() {
     );
   }
 
-  // Has a profile — redirect pending, show nothing
+  // Redirect pending — render nothing to avoid flash
   if (existingProfile) return null;
 
   const updateBasicInfo = (data: Partial<PortfolioData>) =>
@@ -90,6 +112,24 @@ export default function StartupPage() {
     setStep("tabs");
     setSelectedBlockType(null);
     setCurrentTabId(null);
+  };
+
+  // Save data to sessionStorage then redirect to auth
+  const handleSaveAndRedirect = (mode: "signup" | "signin") => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(portfolioData));
+    router.push(`/auth?mode=${mode === "signup" ? "signup" : "signin"}`);
+  };
+
+  const handlePublish = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await saveProfile({ ...portfolioData });
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : "Something went wrong.");
+      setSaving(false);
+    }
   };
 
   const renderStep = () => {
@@ -149,93 +189,45 @@ export default function StartupPage() {
           />
         ) : null;
       }
-      case "preview":
-        return (
-          <div className="space-y-8 animate-in fade-in-50 duration-300">
-            <div className="space-y-1.5">
-              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                Step 4 of 4
-              </p>
-              <h2 className="text-2xl font-bold tracking-tight">Almost there!</h2>
-              <p className="text-sm text-zinc-400">
-                Your portfolio goes live instantly — free, forever. Check the preview, then publish.
-              </p>
-            </div>
-
-            {/* Live badge */}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 ring-1 ring-inset ring-emerald-500/20">
-              <Check className="h-3 w-3" />
-              Free — your profile goes live immediately
-            </span>
-
-            {saveError && <p className="text-sm text-red-400">{saveError}</p>}
-
-            <div className="flex gap-3 pt-2">
-              <Button
-                variant="ghost"
-                onClick={() => setStep("tabs")}
-                className="h-11 rounded-2xl text-zinc-400 hover:text-black"
-              >
-                ← Back
-              </Button>
-              <Button
-                disabled={saving}
-                onClick={async () => {
-                  setSaving(true);
-                  setSaveError(null);
-                  try {
-                    await saveProfile({ ...portfolioData });
-                    router.push("/dashboard");
-                  } catch (err: unknown) {
-                    setSaveError(err instanceof Error ? err.message : "Something went wrong.");
-                    setSaving(false);
-                  }
-                }}
-                className="h-11 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
-              >
-                {saving ? "Publishing…" : "Publish My Portfolio"}
-              </Button>
-            </div>
-          </div>
-        );
+      default:
+        return null;
     }
   };
 
   const currentStepIndex = STEP_INDEX[step];
 
-  return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-white/8 px-6 py-4">
-        <div className="flex items-center gap-2">
-          <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek logo" className="rounded-xl object-contain" />
-          <Image src="/gopeek_logo_text.png" width={72} height={20} alt="GoPeek" className="object-contain" />
-        </div>
+  const header = (
+    <header className="flex items-center justify-between border-b border-white/8 px-6 py-4">
+      <div className="flex items-center gap-2">
+        <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek logo" className="rounded-xl object-contain" />
+        <Image src="/gopeek_logo_text.png" width={72} height={20} alt="GoPeek" className="object-contain" />
+      </div>
 
-        {/* Step progress — desktop */}
-        <div className="hidden items-center gap-1 sm:flex">
-          {STEP_LABELS.map((label, i) => {
-            const done = i < currentStepIndex;
-            const active = i === currentStepIndex;
-            return (
-              <div key={label} className="flex items-center gap-1">
-                <div className={[
-                  "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-colors",
-                  done ? "bg-emerald-500 text-black" : active ? "bg-white text-black" : "bg-white/10 text-zinc-500",
-                ].join(" ")}>
-                  {done ? <Check className="h-3 w-3" /> : i + 1}
-                </div>
-                <span className={["text-xs font-medium transition-colors", active ? "text-white" : "text-zinc-600"].join(" ")}>
-                  {label}
-                </span>
-                {i < STEP_LABELS.length - 1 && (
-                  <div className={["mx-1 h-px w-6 transition-colors", done ? "bg-emerald-500/50" : "bg-white/10"].join(" ")} />
-                )}
+      {/* Step progress — desktop */}
+      <div className="hidden items-center gap-1 sm:flex">
+        {STEP_LABELS.map((label, i) => {
+          const done = i < currentStepIndex;
+          const active = i === currentStepIndex;
+          return (
+            <div key={label} className="flex items-center gap-1">
+              <div className={[
+                "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-colors",
+                done ? "bg-emerald-500 text-black" : active ? "bg-white text-black" : "bg-white/10 text-zinc-500",
+              ].join(" ")}>
+                {done ? <Check className="h-3 w-3" /> : i + 1}
               </div>
-            );
-          })}
-        </div>
+              <span className={["text-xs font-medium transition-colors", active ? "text-white" : "text-zinc-600"].join(" ")}>
+                {label}
+              </span>
+              {i < STEP_LABELS.length - 1 && (
+                <div className={["mx-1 h-px w-6 transition-colors", done ? "bg-emerald-500/50" : "bg-white/10"].join(" ")} />
+              )}
+            </div>
+          );
+        })}
+      </div>
 
+      {isAuthenticated ? (
         <button
           onClick={() => signOut()}
           className="flex items-center gap-1.5 text-xs text-zinc-500 transition hover:text-white"
@@ -243,7 +235,75 @@ export default function StartupPage() {
           <LogOut className="h-3.5 w-3.5" />
           Sign out
         </button>
-      </header>
+      ) : (
+        <Link
+          href="/auth"
+          className="flex items-center gap-1.5 text-xs text-zinc-500 transition hover:text-white"
+        >
+          Sign in
+        </Link>
+      )}
+    </header>
+  );
+
+  // Preview step: full-screen portfolio with sticky publish bar
+  if (step === "preview") {
+    return (
+      <div className="min-h-screen bg-zinc-950 text-white">
+        {header}
+        <div className="pb-24">
+          <PortfolioPreview data={portfolioData} showBadge />
+        </div>
+
+        {/* Sticky bottom publish bar */}
+        <div className="fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-zinc-950/90 backdrop-blur-md">
+          <div className="mx-auto max-w-2xl flex items-center gap-3 px-4 py-4">
+            <Button
+              variant="ghost"
+              onClick={() => setStep("tabs")}
+              className="h-11 rounded-2xl text-zinc-400 hover:text-white shrink-0"
+            >
+              ← Edit
+            </Button>
+
+            {isAuthenticated ? (
+              <div className="flex flex-1 flex-col gap-1">
+                {saveError && <p className="text-xs text-red-400 text-center">{saveError}</p>}
+                <Button
+                  disabled={saving}
+                  onClick={handlePublish}
+                  className="h-11 w-full rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
+                >
+                  {saving ? "Publishing…" : "Publish My Portfolio"}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-1 items-center gap-2">
+                <Button
+                  onClick={() => handleSaveAndRedirect("signup")}
+                  className="h-11 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
+                >
+                  Sign up &amp; Publish — Free
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleSaveAndRedirect("signin")}
+                  className="h-11 rounded-2xl border-white/15 text-zinc-300 hover:bg-white/10 hover:text-white shrink-0"
+                >
+                  Sign in
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Wizard steps: two-column layout with phone mockup on desktop
+  return (
+    <div className="min-h-screen bg-zinc-950 text-white">
+      {header}
 
       <div className="lg:grid lg:grid-cols-2 lg:min-h-[calc(100vh-57px)]">
         {/* Wizard panel */}
@@ -251,8 +311,8 @@ export default function StartupPage() {
           <div className="w-full max-w-lg">{renderStep()}</div>
         </div>
 
-        {/* Live preview — desktop, hidden on preview step */}
-        {step !== "preview" && step !== "blocks" && step !== "block-form" && (
+        {/* Live preview — desktop, hidden for blocks/block-form */}
+        {step !== "blocks" && step !== "block-form" && (
           <div className="hidden lg:flex lg:items-center lg:justify-center lg:border-l lg:border-white/8 lg:bg-white/1">
             <PhoneMockup data={portfolioData} activeTab={portfolioData.tabs[0]?.id} />
           </div>

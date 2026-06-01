@@ -1,11 +1,31 @@
 // ============================================================
 // app/page.tsx
 // ============================================================
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { headers } from "next/headers";
 import { SiteHeader } from "@/components/site-header";
 import { MockupHero } from "@/components/mockup-hero";
+
+export const metadata: Metadata = {
+  title: "First 100 Freelancers Get GoPeek Free for 3 Months",
+  description:
+    "Build a client-ready portfolio in 5 minutes and get discovered early. GoPeek is giving 3 months free to the first 100 Malaysian freelancer profiles. Claim your spot before it's gone.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "First 100 Freelancers Get GoPeek Free for 3 Months",
+    description:
+      "Build a client-ready portfolio in 5 minutes and get discovered early. GoPeek is giving 3 months free to the first 100 Malaysian freelancer profiles. Claim your spot before it's gone.",
+    url: "https://gopeek.my",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "First 100 Freelancers Get GoPeek Free for 3 Months",
+    description:
+      "Build a client-ready portfolio in 5 minutes and get discovered early. GoPeek is giving 3 months free to the first 100 Malaysian freelancer profiles. Claim your spot before it's gone.",
+  },
+};
 
 const features = [
   {
@@ -52,8 +72,8 @@ function getSteps(cur: string) {
       step: "03"
     },
     {
-      title: "Go Live",
-      desc: `Your profile publishes instantly on the Free plan. Upgrade to Publish (from ${cur} 19, one-time) for a custom username and unlimited content.`,
+      title: "Go Live — Free",
+      desc: "Hit publish and your portfolio is live instantly on a gopeek.my link. Share it right away. No waiting, no payment, no setup fee.",
       step: "04"
     }
   ];
@@ -65,20 +85,19 @@ function getPricingTiers(cur: string) {
       name: "Free",
       price: `${cur} 0`,
       period: "",
-      description: "Build and go live — no credit card required.",
+      description: "Live in 5 minutes. Free forever. No card needed.",
       features: [
-        "3 blocks, 3 projects (tabs)",
-        "6 images total",
-        "Auto-generated public URL",
-        "Basic lead capture (WhatsApp / Email)",
-        "Basic themes only",
-        "No analytics",
-        "GoPeek badge on profile",
+        "Live gopeek.my link — instantly",
+        "WhatsApp & email contact button",
+        "3 projects, 3 blocks, 6 images",
+        "Looks great on any phone",
+        "Free forever — not a trial",
       ],
-      cta: "Start Building",
+      cta: "Build My Free Portfolio",
       ctaHref: "/startup",
       highlight: false,
-      badge: null,
+      isFree: true,
+      badge: "Free forever",
     },
     {
       name: "Publish",
@@ -95,25 +114,8 @@ function getPricingTiers(cur: string) {
       cta: "See Publish Plans",
       ctaHref: "/pricing",
       highlight: true,
-      badge: "Most popular",
-    },
-    {
-      name: "Pro",
-      price: "Coming soon",
-      period: "",
-      description: "Custom domain and advanced analytics.",
-      features: [
-        "Everything in Publish",
-        "Premium themes",
-        "Custom domain (yourname.com)",
-        "Advanced analytics",
-        "Multiple portfolios",
-        "Priority support",
-      ],
-      cta: "Notify Me",
-      ctaHref: "/pricing",
-      highlight: false,
       badge: null,
+      isFree: false,
     },
   ];
 }
@@ -129,11 +131,11 @@ const faqs = [
   },
   {
     q: "Is GoPeek a good Linktree alternative for Malaysian freelancers?",
-    a: "Yes — and it goes much deeper than Linktree. Instead of just a list of links, GoPeek gives you a full project portfolio with galleries, videos, and experience blocks. You also get built-in lead capture (WhatsApp / email) and a custom username like gopeek.my/yourname on the Publish plan."
+    a: "Yes — and it goes much deeper than Linktree. Instead of just a list of links, GoPeek gives you a full project portfolio with galleries, videos, and experience blocks. You also get built-in lead capture (WhatsApp / email), and a custom username like gopeek.my/yourname when you upgrade to Publish."
   },
   {
     q: "What's the difference between the Free and Publish plans?",
-    a: "Free lets you build and go live with an auto-generated URL — completely free, forever. Publish (from RM 19, one-time) gives you a custom username, removes the GoPeek badge, unlocks unlimited content and basic analytics. Choose 1 month (RM 19), 3 months (RM 54), 6 months (RM 99), or 12 months (RM 180). No recurring charges."
+    a: "Free lets you build and go live with an auto-generated URL — completely free, forever. Publish (from RM 19, one-time) gives you a custom username, removes the GoPeek badge, unlocks unlimited content and basic analytics. Choose 1 month (RM 19), 3 months (RM 57), 6 months (RM 114), or 12 months (RM 228). No recurring charges."
   },
   {
     q: "What happens when my Publish plan expires?",
@@ -272,17 +274,102 @@ export default async function Page() {
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                No auto-renewal
+                Free forever — not a trial
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                FPX &amp; card supported
+                Live in under 5 minutes
               </span>
             </div>
           </div>
 
           <div className="relative">
             <MockupHero />
+          </div>
+        </div>
+      </section>
+
+      {/* CAMPAIGN BANNER */}
+      <section className="mx-auto max-w-6xl px-6 pb-4">
+        <Link
+          href="/free100"
+          className="group flex items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/8 px-5 py-3.5 transition hover:bg-amber-500/12"
+        >
+          <div className="flex items-center gap-3">
+            <span className="hidden h-2 w-2 rounded-full bg-amber-400 animate-pulse sm:block" />
+            <p className="text-sm font-semibold text-amber-300">
+              🎉 First 100 Freelancers — Get 3 Months of Publish Free
+            </p>
+            <span className="hidden rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-400 sm:inline">
+              Limited
+            </span>
+          </div>
+          <span className="shrink-0 text-xs font-semibold text-amber-400 group-hover:underline">
+            Claim now →
+          </span>
+        </Link>
+      </section>
+
+      {/* FREE FOREVER STRIP */}
+      <section className="mx-auto max-w-6xl px-6 pb-10">
+        <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/5 px-8 py-7">
+          <p className="mb-5 text-center text-xs font-semibold uppercase tracking-widest text-emerald-400">
+            What you get for free — forever
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: "🔗", label: "Your own gopeek.my link", sub: "Live and shareable instantly" },
+              { icon: "💬", label: "WhatsApp contact button", sub: "Clients reach you in one tap" },
+              { icon: "📁", label: "3 projects & 6 images", sub: "Enough to show your best work" },
+              { icon: "♾️", label: "Free forever", sub: "No trial. No expiry. No catch." },
+            ].map((item) => (
+              <div key={item.label} className="flex items-start gap-3">
+                <span className="mt-0.5 text-xl">{item.icon}</span>
+                <div>
+                  <p className="text-sm font-semibold text-white">{item.label}</p>
+                  <p className="mt-0.5 text-xs text-zinc-400">{item.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex justify-center">
+            <PrimaryCTA href="/startup">Build My Free Portfolio — No Card Needed</PrimaryCTA>
+          </div>
+        </div>
+      </section>
+
+      {/* DEMO SHOWCASE */}
+      <section className="mx-auto max-w-6xl px-6 pb-10">
+        <div className="rounded-3xl border border-white/10 bg-white/3 p-6 sm:p-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">See it live</p>
+              <h2 className="text-xl font-semibold text-white">
+                This is what your portfolio looks like.
+              </h2>
+              <p className="text-sm text-zinc-400">
+                A real GoPeek portfolio — built in 5 minutes, live at a shareable link.
+              </p>
+              <div className="flex items-center gap-2 pt-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-mono text-sm text-zinc-300">gopeek.my/sulaimanshafiq</span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 sm:items-end">
+              <Link
+                href="/sulaimanshafiq"
+                target="_blank"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-zinc-200 transition-colors"
+              >
+                View Demo Portfolio ↗
+              </Link>
+              <Link
+                href="/startup"
+                className="text-xs text-zinc-500 hover:text-zinc-300 transition"
+              >
+                Build yours free →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -463,22 +550,26 @@ export default async function Page() {
       <section id="pricing" className="mx-auto max-w-6xl px-6 py-14">
         <SectionHeader
           kicker="Pricing"
-          title="Build free. Publish when you're ready."
-          subtitle="No recurring charges. No auto-renewal. Your content stays yours forever."
+          title="Start free. Upgrade only when it makes sense."
+          subtitle="The free plan is real — not a trial. Build, go live, and share your work today at no cost."
         />
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 max-w-2xl mx-auto">
           {pricingTiers.map((tier) => (
             <div
               key={tier.name}
               className={`relative flex flex-col rounded-3xl border p-8 ${
-                tier.highlight
+                tier.isFree
+                  ? "border-emerald-500/50 bg-emerald-500/5"
+                  : tier.highlight
                   ? "border-indigo-500 bg-indigo-500/5"
                   : "border-white/10 bg-white/3"
               }`}
             >
               {tier.badge && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-500 px-3 py-0.5 text-xs font-semibold text-white">
+                <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold text-white ${
+                  tier.isFree ? "bg-emerald-500" : "bg-indigo-500"
+                }`}>
                   {tier.badge}
                 </span>
               )}
@@ -497,19 +588,19 @@ export default async function Page() {
               <ul className="mb-8 flex-1 space-y-3">
                 {tier.features.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-zinc-300">
-                    <Check />
+                    <Check emerald={tier.isFree} />
                     {f}
                   </li>
                 ))}
               </ul>
 
-              {tier.name === "Pro" ? (
-                <button
-                  disabled
-                  className="inline-flex w-full items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-zinc-500 cursor-not-allowed"
+              {tier.isFree ? (
+                <Link
+                  href={tier.ctaHref}
+                  className="inline-flex w-full items-center justify-center rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-400 transition-colors"
                 >
-                  Coming Soon
-                </button>
+                  {tier.cta}
+                </Link>
               ) : tier.highlight ? (
                 <PrimaryCTA href={tier.ctaHref}>{tier.cta}</PrimaryCTA>
               ) : (
@@ -712,9 +803,9 @@ function Card({
   );
 }
 
-function Check() {
+function Check({ emerald = false }: { emerald?: boolean }) {
   return (
-    <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
+    <span className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${emerald ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-500/15 text-emerald-300"}`}>
       ✓
     </span>
   );

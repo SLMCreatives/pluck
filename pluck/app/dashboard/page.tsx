@@ -15,14 +15,14 @@ import {
   Copy,
   LogOut,
   Check,
-  Layers,
-  Link2,
   Eye,
   Lock,
   Globe,
   ArrowUpRight,
   CalendarClock,
   AlertTriangle,
+  BarChart2,
+  Share2,
 } from "lucide-react";
 import type { PortfolioData } from "@/types/portfolio";
 
@@ -31,6 +31,7 @@ const TIER_LABEL: Record<string, string> = {
   publish: "Publish",
   pro: "Pro",
 };
+
 function formatExpiry(ts: number): string {
   return new Date(ts).toLocaleDateString("en-MY", {
     day: "numeric",
@@ -62,7 +63,6 @@ function TierBadge({ tier }: { tier: string }) {
     </span>
   );
 }
-
 
 function Toggle({
   checked,
@@ -164,9 +164,9 @@ export default function DashboardPage() {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
+      {/* Header */}
       <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
         <div className="flex items-center gap-2">
           <Image src="/GoPeek.png" width={32} height={32} alt="GoPeek logo" className="rounded-xl object-contain" />
@@ -183,213 +183,112 @@ export default function DashboardPage() {
 
       <div className="lg:grid lg:grid-cols-2 lg:min-h-[calc(100vh-57px)]">
         {/* ── Left panel ── */}
-        <div className="flex flex-col gap-5 p-6 lg:p-12">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Dashboard
-            </p>
-            <h1 className="mt-1 text-2xl font-semibold">Your Portfolio</h1>
-          </div>
+        <div className="flex flex-col gap-4 p-6 lg:p-10">
 
-          {/* Profile card */}
-          <div className="rounded-3xl border border-white/10 bg-white/3 p-5">
-            <div className="flex items-center gap-4">
-              {profile.profileImage ? (
-                <img
-                  src={profile.profileImage}
-                  alt={profile.fullName}
-                  className="h-16 w-16 shrink-0 rounded-2xl border border-white/10 object-cover"
-                />
-              ) : (
-                <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-white/10 text-xl font-bold">
-                  {profile.fullName.charAt(0).toUpperCase()}
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="truncate text-lg font-semibold">{profile.fullName}</p>
-                  <TierBadge tier={tier} />
-                </div>
-                <p className="truncate text-sm text-zinc-400">{profile.professionalTitle}</p>
-                {profile.bio && (
-                  <p className="mt-1 line-clamp-2 text-xs text-zinc-500">{profile.bio}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
-              <div className="flex items-center gap-2 text-zinc-400">
-                <Layers className="h-4 w-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Tabs</span>
-              </div>
-              <p className="mt-2 text-3xl font-semibold">{data.tabs.length}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
-              <div className="flex items-center gap-2 text-zinc-400">
-                <Link2 className="h-4 w-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Blocks</span>
-              </div>
-              <p className="mt-2 text-3xl font-semibold">{totalBlocks}</p>
-            </div>
-            {isPaid ? (
-              <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
-                <div className="flex items-center gap-2 text-zinc-400">
-                  <Eye className="h-4 w-4" />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Views</span>
-                </div>
-                <p className="mt-2 text-3xl font-semibold">{profile.viewCount ?? 0}</p>
-              </div>
+          {/* Profile strip */}
+          <div className="flex items-center gap-4 rounded-3xl border border-white/10 bg-white/3 p-5">
+            {profile.profileImage ? (
+              <img
+                src={profile.profileImage}
+                alt={profile.fullName}
+                className="h-14 w-14 shrink-0 rounded-2xl border border-white/10 object-cover"
+              />
             ) : (
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/3 p-4">
-                <div className="flex items-center gap-2 text-zinc-600">
-                  <Eye className="h-4 w-4" />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Views</span>
-                </div>
-                <p className="mt-2 text-3xl font-semibold text-zinc-700">—</p>
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-zinc-950/80 backdrop-blur-sm">
-                  <Lock className="h-4 w-4 text-zinc-500" />
-                  <Link href="/pricing" className="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
-                    Upgrade to Publish
-                  </Link>
-                </div>
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/10 text-xl font-bold">
+                {profile.fullName.charAt(0).toUpperCase()}
               </div>
             )}
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="truncate font-semibold">{profile.fullName}</p>
+                <TierBadge tier={tier} />
+              </div>
+              <p className="truncate text-sm text-zinc-400">{profile.professionalTitle}</p>
+            </div>
           </div>
 
-          {/* ── Visibility toggle (paid) / Upgrade banner (free) ── */}
-          {isPaid ? (
-            <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-zinc-400" />
-                    <p className="text-sm font-semibold">Profile Visibility</p>
-                  </div>
-                  <p className="mt-0.5 text-xs text-zinc-500">
-                    {profile.published
-                      ? "Your profile is live and visible to anyone."
-                      : "Your profile is hidden. Toggle to go live."}
-                  </p>
-                </div>
-                <Toggle
-                  checked={!!profile.published}
-                  onChange={handleTogglePublish}
-                  disabled={publishToggling}
-                />
+          {/* ── Three primary cards ── */}
+          <div className="grid gap-4 sm:grid-cols-2">
+
+            {/* Edit */}
+            <div className="flex flex-col gap-5 rounded-3xl border border-white/10 bg-white/3 p-6">
+              <div className="flex items-center gap-2 text-zinc-400">
+                <Edit2 className="h-4 w-4" />
+                <p className="text-xs font-semibold uppercase tracking-wider">Edit</p>
               </div>
-              <div className="mt-3 flex items-center gap-1.5">
-                <span
-                  className={[
-                    "h-2 w-2 rounded-full",
-                    profile.published ? "animate-pulse bg-emerald-400" : "bg-zinc-600",
-                  ].join(" ")}
-                />
-                <span
-                  className={[
-                    "text-xs font-semibold",
-                    profile.published ? "text-emerald-400" : "text-zinc-500",
-                  ].join(" ")}
-                >
-                  {publishToggling ? "Updating…" : profile.published ? "Live" : "Draft"}
-                </span>
-              </div>
-              {publishError && (
-                <p className="mt-2 text-xs text-red-400">{publishError}</p>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-4">
-              <div className="flex items-start gap-3">
-                <Globe className="mt-0.5 h-4 w-4 shrink-0 text-indigo-400" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-indigo-300">You&apos;re live on the Free plan</p>
-                  <p className="mt-0.5 text-xs text-indigo-400/80">
-                    Upgrade to Publish for a custom username and no GoPeek badge.
-                  </p>
-                </div>
-                <Button
-                  asChild
-                  className="h-8 shrink-0 rounded-xl bg-indigo-500 px-3 text-xs font-semibold text-white hover:bg-indigo-400"
-                >
-                  <Link href="/pricing">Upgrade</Link>
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* ── Subscription & Billing ── */}
-          <div className="rounded-2xl border border-white/10 bg-white/3 p-5 space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Plan & Billing
-            </p>
-
-            {isPaid ? (
-              <>
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-xl font-bold">{TIER_LABEL[tier]} Plan</p>
-                    {expiresAt && (
-                      <p className="mt-0.5 text-sm text-zinc-400">
-                        Active until {formatExpiry(expiresAt)}
-                      </p>
-                    )}
-                  </div>
-                  <TierBadge tier={tier} />
-                </div>
-
-                {isExpiringSoon && (
-                  <div className="flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2.5">
-                    <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
-                    <p className="text-xs text-amber-300">
-                      Expires in {daysLeft} day{daysLeft === 1 ? "" : "s"} — renew to stay live.
-                    </p>
-                  </div>
-                )}
-
-                <Button
-                  asChild
-                  className="h-10 w-full rounded-xl bg-indigo-500 text-white hover:bg-indigo-400"
-                >
-                  <Link href="/pricing" className="flex items-center justify-center gap-2">
-                    <CalendarClock className="h-4 w-4" />
-                    Renew or extend
-                  </Link>
-                </Button>
-              </>
-            ) : (
-              <>
+              <div className="flex flex-1 gap-6">
                 <div>
-                  <p className="text-xl font-bold">Free Plan</p>
-                  <p className="text-sm text-zinc-400">Live with auto-generated URL</p>
+                  <p className="text-3xl font-bold">{data.tabs.length}</p>
+                  <p className="mt-0.5 text-xs text-zinc-500">Projects</p>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-xs text-zinc-500">
-                    Upgrade to Publish for a custom username, no badge, and analytics.
-                  </p>
-                  <Button
-                    asChild
-                    className="h-10 w-full rounded-xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
+                <div>
+                  <p className="text-3xl font-bold">{totalBlocks}</p>
+                  <p className="mt-0.5 text-xs text-zinc-500">Blocks</p>
+                </div>
+              </div>
+              <Link
+                href="/dashboard/edit"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-2xl bg-white text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
+              >
+                <Edit2 className="h-4 w-4" />
+                Edit Portfolio
+              </Link>
+            </div>
+
+            {/* Analytics */}
+            <div className="flex flex-col gap-5 rounded-3xl border border-white/10 bg-white/3 p-6">
+              <div className="flex items-center gap-2 text-zinc-400">
+                <BarChart2 className="h-4 w-4" />
+                <p className="text-xs font-semibold uppercase tracking-wider">Analytics</p>
+              </div>
+              {isPaid ? (
+                <>
+                  <div className="flex-1">
+                    <p className="text-3xl font-bold">{profile.viewCount ?? 0}</p>
+                    <p className="mt-0.5 text-xs text-zinc-500">Total profile views</p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Eye className="h-3.5 w-3.5 text-emerald-400" />
+                    <span className="text-xs text-emerald-400">Live tracking</span>
+                  </div>
+                </>
+              ) : (
+                <div className="relative flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border border-white/5 bg-white/3 py-6">
+                  <Lock className="h-5 w-5 text-zinc-600" />
+                  <p className="text-xs text-zinc-500">Unlock with Publish</p>
+                  <Link
+                    href="/pricing"
+                    className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-indigo-400 transition hover:text-indigo-300"
                   >
-                    <Link href="/pricing" className="flex items-center justify-center gap-2">
-                      View plans
-                      <ArrowUpRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
+                    Upgrade <ArrowUpRight className="h-3 w-3" />
+                  </Link>
                 </div>
-              </>
-            )}
+              )}
+            </div>
           </div>
 
-          {/* Public URL */}
-          <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Public URL
-            </p>
-            <div className="flex items-center justify-between gap-3">
-              <span className="truncate font-mono text-sm text-zinc-300">{publicUrl}</span>
+          {/* Share — full width */}
+          <div className="rounded-3xl border border-white/10 bg-white/3 p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-zinc-400">
+                <Share2 className="h-4 w-4" />
+                <p className="text-xs font-semibold uppercase tracking-wider">Share</p>
+              </div>
+              {isPaid && (
+                <div className="flex items-center gap-2.5">
+                  <span className={`text-xs font-semibold ${profile.published ? "text-emerald-400" : "text-zinc-500"}`}>
+                    {publishToggling ? "Updating…" : profile.published ? "Live" : "Hidden"}
+                  </span>
+                  <span className={`h-1.5 w-1.5 rounded-full ${profile.published ? "animate-pulse bg-emerald-400" : "bg-zinc-600"}`} />
+                  <Toggle checked={!!profile.published} onChange={handleTogglePublish} disabled={publishToggling} />
+                </div>
+              )}
+            </div>
+
+            {/* URL bar */}
+            <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+              <Globe className="h-4 w-4 shrink-0 text-zinc-500" />
+              <span className="flex-1 truncate font-mono text-sm text-zinc-300">{publicUrl}</span>
               <button
                 onClick={copyUrl}
                 className="flex shrink-0 items-center gap-1.5 rounded-xl bg-white/5 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:bg-white/10"
@@ -397,16 +296,20 @@ export default function DashboardPage() {
                 {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? "Copied!" : "Copy"}
               </button>
+              <Link
+                href={`/${profile.slug}`}
+                target="_blank"
+                className="flex shrink-0 items-center gap-1.5 rounded-xl bg-white/5 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:bg-white/10"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                View
+              </Link>
             </div>
-          </div>
 
-          {/* Share */}
-          <div className="rounded-2xl border border-white/10 bg-white/3 p-4">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Share your profile
-            </p>
+            {publishError && <p className="text-xs text-red-400">{publishError}</p>}
+
+            {/* Social share */}
             <div className="flex gap-2">
-              {/* WhatsApp */}
               <a
                 href={whatsappShareUrl}
                 target="_blank"
@@ -418,8 +321,6 @@ export default function DashboardPage() {
                 </svg>
                 WhatsApp
               </a>
-
-              {/* X */}
               <a
                 href={xShareUrl}
                 target="_blank"
@@ -431,8 +332,6 @@ export default function DashboardPage() {
                 </svg>
                 X
               </a>
-
-              {/* Instagram */}
               <button
                 onClick={shareToInstagram}
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#E1306C]/10 px-3 py-2.5 text-xs font-semibold text-[#E1306C] transition hover:bg-[#E1306C]/20"
@@ -443,33 +342,52 @@ export default function DashboardPage() {
                 Instagram
               </button>
             </div>
-            {shareToast && (
-              <p className="mt-2.5 text-xs text-emerald-400">{shareToast}</p>
+            {shareToast && <p className="text-xs text-emerald-400">{shareToast}</p>}
+          </div>
+
+          {/* Plan & Billing — compact */}
+          <div className="rounded-3xl border border-white/10 bg-white/3 p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Plan</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <p className="font-semibold">{TIER_LABEL[tier]}</p>
+                  <TierBadge tier={tier} />
+                </div>
+                {isPaid && expiresAt && (
+                  <p className="mt-0.5 text-xs text-zinc-500">Active until {formatExpiry(expiresAt)}</p>
+                )}
+                {!isPaid && (
+                  <p className="mt-0.5 text-xs text-zinc-500">Free forever — upgrade for custom username & analytics</p>
+                )}
+              </div>
+              <Button
+                asChild
+                className={`h-9 shrink-0 rounded-xl px-4 text-xs font-semibold ${
+                  isPaid
+                    ? "bg-white/10 text-white hover:bg-white/20"
+                    : "bg-indigo-500 text-white hover:bg-indigo-400"
+                }`}
+              >
+                <Link href="/pricing" className="flex items-center gap-1.5">
+                  {isPaid ? (
+                    <><CalendarClock className="h-3.5 w-3.5" /> Renew</>
+                  ) : (
+                    <><ArrowUpRight className="h-3.5 w-3.5" /> Upgrade</>
+                  )}
+                </Link>
+              </Button>
+            </div>
+            {isExpiringSoon && (
+              <div className="mt-3 flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2.5">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
+                <p className="text-xs text-amber-300">
+                  Expires in {daysLeft} day{daysLeft === 1 ? "" : "s"} — renew to stay live.
+                </p>
+              </div>
             )}
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3">
-            <Button
-              asChild
-              variant="outline"
-              className="h-12 flex-1 rounded-2xl border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-            >
-              <Link href={`/${profile.slug}`} target="_blank" className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                View Profile
-              </Link>
-            </Button>
-            <Button
-              asChild
-              className="h-12 flex-1 rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
-            >
-              <Link href="/dashboard/edit" className="flex items-center gap-2">
-                <Edit2 className="h-4 w-4" />
-                Edit Profile
-              </Link>
-            </Button>
-          </div>
         </div>
 
         {/* ── Right panel — phone preview (desktop only) ── */}

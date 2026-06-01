@@ -1,19 +1,6 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 
-// Amounts in smallest currency unit (sen for MYR, cents for USD).
-// Numeric values are identical across currencies per pricing strategy.
-const AMOUNT_UNITS: Record<number, number> = {
-  1: 1900,
-  3: 5400,
-  6: 9900,
-  12: 18000,
-};
-
-function amountForMonths(months: number): number {
-  return AMOUNT_UNITS[months] ?? months * 1900;
-}
-
 export const createSubscriptionCheckout = action({
   args: {
     profileId: v.id("profiles"),
@@ -29,17 +16,19 @@ export const createSubscriptionCheckout = action({
       throw new Error("Stripe not configured. Set STRIPE_SECRET_KEY in Convex environment variables.");
     }
 
-    const amount = amountForMonths(months);
-    const label = months === 1 ? "1 month" : `${months} months`;
     const isMYR = currency === "myr";
+    const priceId = isMYR
+      ? process.env.STRIPE_PUBLISH_PRICE_ID_MYR
+      : process.env.STRIPE_PUBLISH_PRICE_ID_USD;
+
+    if (!priceId) {
+      const envVar = isMYR ? "STRIPE_PUBLISH_PRICE_ID_MYR" : "STRIPE_PUBLISH_PRICE_ID_USD";
+      throw new Error(`Stripe product not configured. Set ${envVar} in Convex environment variables.`);
+    }
 
     const body = new URLSearchParams({
-      "line_items[0][price_data][currency]": currency,
-      "line_items[0][price_data][product_data][name]": `GoPeek Publish — ${label}`,
-      "line_items[0][price_data][product_data][description]":
-        `Custom username, no GoPeek badge, analytics. Valid for ${label}.`,
-      "line_items[0][price_data][unit_amount]": String(amount),
-      "line_items[0][quantity]": "1",
+      "line_items[0][price]": priceId,
+      "line_items[0][quantity]": String(months),
       mode: "payment",
       customer_email: email,
       "payment_method_types[0]": "card",
