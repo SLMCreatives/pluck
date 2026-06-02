@@ -4,30 +4,49 @@
 
 ## What GoPeek does
 
-GoPeek lets freelancers (designers, developers, photographers, writers, videographers, etc.) create a public portfolio page at `gopeek.my/<username>`. The portfolio includes a bio, social links, and tabbed project sections with gallery images, videos, and experience entries. A built-in WhatsApp/email lead capture button lets clients contact the freelancer instantly.
+GoPeek lets freelancers (designers, developers, photographers, writers, videographers, etc.) create a public portfolio page at `gopeek.my/<username>`. The portfolio includes a cover photo, profile photo, bio, social links, and tabbed project sections with gallery images, videos, and experience entries. A built-in WhatsApp/email lead capture button (floating action button) lets clients contact the freelancer instantly. Visitors can leave emoji reactions on any portfolio page.
 
 ## Pages
 
 - [Home](https://gopeek.my/) — Product overview, features, and sign-up CTA
+- [Discovery](https://gopeek.my/discovery) — Public directory of all published freelancer portfolios; shows profile cards with name, title, bio, slug, and top emoji reactions
 - [Pricing](https://gopeek.my/pricing) — Plan comparison: Free (RM 0) vs Publish (RM 19/mo) vs Pro (coming soon)
 - [Docs](https://gopeek.my/docs) — Step-by-step guide to building and publishing a portfolio
 - [Privacy Policy](https://gopeek.my/privacy)
 - [Terms of Service](https://gopeek.my/terms)
+
+## Portfolio pages
+
+Each published portfolio is accessible at `gopeek.my/<slug>` (e.g. `gopeek.my/sulaimanshafiq`). Portfolios include:
+- Cover photo (optional, full-width banner)
+- Profile photo and avatar
+- Name, professional title, bio
+- Social links (Instagram, LinkedIn, WhatsApp, Email, Website, YouTube, GitHub, TikTok, Behance, Dribbble)
+- Tabbed content sections (Work, Portfolio, etc.) containing gallery blocks, video blocks, and experience blocks
+- Light / dark theme (set by the portfolio owner; visitors can toggle locally)
+- Emoji reactions (❤️ 🔥 👏 😍 🚀 ✨) — any visitor can react; counts are shown in real time
+- Contact FAB (floating action button) — tapping opens a sheet to contact the creator via WhatsApp, email, or phone
+- GoPeek badge on free-tier portfolios
 
 ## Plans
 
 | Plan    | Price              | Key features |
 |---------|--------------------|--------------|
 | Free    | RM 0 forever       | 3 tabs, 3 blocks, 6 images, auto-generated URL, GoPeek badge, basic lead capture |
-| Publish | RM 19/mo           | Unlimited tabs/blocks/images, custom username, no badge, enhanced lead capture, view count analytics |
+| Publish | RM 19/mo (pay per duration: 1/3/6/12 months) | Unlimited tabs/blocks/images, custom username, no badge, enhanced lead capture, view count analytics |
 | Pro     | Coming soon        | Custom domain, advanced analytics, multiple portfolios |
 
 ## Key facts for AI agents
 
-- Target audience: Malaysian freelancers (designers, developers, photographers, copywriters, etc.)
+- Target audience: Malaysian freelancers (designers, developers, photographers, copywriters, videographers, etc.)
 - Primary language: English (Malaysia)
 - Free tier is permanent — no credit card required
-- Portfolios are live immediately at `gopeek.my/<slug>` after sign-up
-- Contact/lead capture uses WhatsApp or Email
-- Built with Next.js, Convex (backend/auth), Stripe (payments), Tailwind CSS
+- Portfolios go live immediately at `gopeek.my/<slug>` after sign-up
+- Contact/lead capture uses WhatsApp or Email (via a floating action button + confirmation sheet)
+- Emoji reactions (❤️ 🔥 👏 😍 🚀 ✨) are available on every public portfolio; stored per anonymous visitor
+- Discovery page at `/discovery` lists all published portfolios with live reaction counts
+- Portfolio owners can set their preferred theme (light/dark); visitors see that theme by default but can toggle it
+- Profile owners see an "Edit profile" button when viewing their own portfolio
+- Built with Next.js 15, Convex (backend/realtime DB/auth), Stripe (payments), Tailwind CSS v4, shadcn/ui
 - The product is in active early-access; Pro tier is not yet launched
+- Hosted at gopeek.my (Malaysia)

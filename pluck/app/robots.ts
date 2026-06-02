@@ -19,7 +19,7 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "meta-externalagent", allow: "/" },
       {
         userAgent: "*",
-        allow: ["/", "/llms.txt"],
+        allow: ["/", "/discovery", "/llms.txt"],
         disallow: privateRoutes,
       },
     ],
