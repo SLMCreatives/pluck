@@ -1,0 +1,33 @@
+# GoPeek
+
+> GoPeek is a mobile-first portfolio builder for Malaysian freelancers. Build a professional, shareable portfolio in 5 minutes — free forever, no design skills required.
+
+## What GoPeek does
+
+GoPeek lets freelancers (designers, developers, photographers, writers, videographers, etc.) create a public portfolio page at `gopeek.my/<username>`. The portfolio includes a bio, social links, and tabbed project sections with gallery images, videos, and experience entries. A built-in WhatsApp/email lead capture button lets clients contact the freelancer instantly.
+
+## Pages
+
+- [Home](https://gopeek.my/) — Product overview, features, and sign-up CTA
+- [Pricing](https://gopeek.my/pricing) — Plan comparison: Free (RM 0) vs Publish (RM 19/mo) vs Pro (coming soon)
+- [Docs](https://gopeek.my/docs) — Step-by-step guide to building and publishing a portfolio
+- [Privacy Policy](https://gopeek.my/privacy)
+- [Terms of Service](https://gopeek.my/terms)
+
+## Plans
+
+| Plan    | Price              | Key features |
+|---------|--------------------|--------------|
+| Free    | RM 0 forever       | 3 tabs, 3 blocks, 6 images, auto-generated URL, GoPeek badge, basic lead capture |
+| Publish | RM 19/mo           | Unlimited tabs/blocks/images, custom username, no badge, enhanced lead capture, view count analytics |
+| Pro     | Coming soon        | Custom domain, advanced analytics, multiple portfolios |
+
+## Key facts for AI agents
+
+- Target audience: Malaysian freelancers (designers, developers, photographers, copywriters, etc.)
+- Primary language: English (Malaysia)
+- Free tier is permanent — no credit card required
+- Portfolios are live immediately at `gopeek.my/<slug>` after sign-up
+- Contact/lead capture uses WhatsApp or Email
+- Built with Next.js, Convex (backend/auth), Stripe (payments), Tailwind CSS
+- The product is in active early-access; Pro tier is not yet launched

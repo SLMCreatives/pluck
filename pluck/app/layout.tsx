@@ -67,6 +67,9 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true },
   },
+  other: {
+    "llms-txt": "https://gopeek.my/llms.txt",
+  },
 };
 
 export default function RootLayout({
@@ -101,6 +104,58 @@ export default function RootLayout({
             src="https://static.cloudflareinsights.com/beacon.min.js"
             data-cf-beacon='{"token": "898cf19b8fec4506aa17bf66edd006ec"}'
             strategy="afterInteractive"
+          />
+
+          {/* Structured data for AI agents and search engines */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify([
+                {
+                  "@context": "https://schema.org",
+                  "@type": "WebSite",
+                  name: "GoPeek",
+                  url: "https://gopeek.my",
+                  description: "Free mobile-first portfolio builder for Malaysian freelancers",
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: { "@type": "EntryPoint", urlTemplate: "https://gopeek.my/{search_term_string}" },
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+                {
+                  "@context": "https://schema.org",
+                  "@type": "SoftwareApplication",
+                  name: "GoPeek",
+                  url: "https://gopeek.my",
+                  applicationCategory: "BusinessApplication",
+                  operatingSystem: "Web",
+                  description:
+                    "Build a professional mobile-first portfolio in 5 minutes — free forever, no credit card needed. WhatsApp lead capture, a shareable gopeek.my link, and zero design skills required. Built for Malaysian freelancers.",
+                  offers: [
+                    {
+                      "@type": "Offer",
+                      name: "Free",
+                      price: "0",
+                      priceCurrency: "MYR",
+                      description: "3 tabs, 3 blocks, 6 images, auto-generated URL, basic lead capture",
+                    },
+                    {
+                      "@type": "Offer",
+                      name: "Publish",
+                      price: "19",
+                      priceCurrency: "MYR",
+                      description: "Unlimited tabs, blocks, images, custom username, analytics",
+                    },
+                  ],
+                  creator: {
+                    "@type": "Organization",
+                    name: "GoPeek",
+                    url: "https://gopeek.my",
+                  },
+                },
+              ]),
+            }}
           />
         </body>
       </html>
