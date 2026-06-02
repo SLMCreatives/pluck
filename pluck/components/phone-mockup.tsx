@@ -6,9 +6,10 @@ import { PortfolioPreview } from "./portfolio-preview";
 interface PhoneMockupProps {
   data: PortfolioData;
   activeTab?: string;
+  initialTheme?: "light" | "dark";
 }
 
-export function PhoneMockup({ data, activeTab }: PhoneMockupProps) {
+export function PhoneMockup({ data, activeTab, initialTheme }: PhoneMockupProps) {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-57px)] sticky top-0">
       {/* Ambient glow like landing page */}
@@ -43,7 +44,7 @@ export function PhoneMockup({ data, activeTab }: PhoneMockupProps) {
             {/* Scroll container — transform-gpu creates a new containing block so
                 fixed-position children inside PortfolioPreview stay inside the phone frame */}
             <div className="absolute inset-0 overflow-y-auto overscroll-contain scrollbar-hide transform-gpu">
-              <PortfolioPreview data={data} activeTab={activeTab} />
+              <PortfolioPreview data={data} activeTab={activeTab} initialTheme={initialTheme} />
             </div>
 
             {/* Bottom fade mask for realism */}

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { UploadCloud, Loader2 } from "lucide-react";
 import { useUploadThing } from "@/lib/uploadthing";
+import { CoverImagePicker } from "@/components/cover-image-picker";
 
 interface StepOnboardingProps {
   data: {
@@ -15,6 +16,7 @@ interface StepOnboardingProps {
     professionalTitle: string;
     bio: string;
     profileImage: string;
+    coverImage?: string;
   };
   onUpdate: (data: any) => void;
   onNext: () => void;
@@ -101,7 +103,7 @@ export function StepOnboarding({
 
         <div className="space-y-2">
           <Label className={label}>Profile Photo (Optional)</Label>
-          <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-white/20 bg-white/[0.02] p-4 transition hover:border-white/40">
+          <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-white/20 bg-white/2 p-4 transition hover:border-white/40">
             <input
               type="file"
               accept="image/*"
@@ -141,6 +143,14 @@ export function StepOnboarding({
               <p className="text-xs text-zinc-500">PNG, JPG up to 2 MB</p>
             </div>
           </label>
+        </div>
+
+        <div className="space-y-2">
+          <Label className={label}>Cover Photo (Optional)</Label>
+          <CoverImagePicker
+            value={formData.coverImage ?? ""}
+            onChange={(url) => handleChange("coverImage", url)}
+          />
         </div>
       </div>
 

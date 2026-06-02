@@ -39,9 +39,18 @@ export default defineSchema({
     subscriptionStatus: v.optional(v.string()),
     subscriptionExpiresAt: v.optional(v.number()),
     viewCount: v.optional(v.number()),
+    coverImage: v.optional(v.string()),
+    theme: v.optional(v.union(v.literal("light"), v.literal("dark"))),
   })
     .index("by_slug", ["slug"])
     .index("by_user", ["userId"])
     .index("by_bill", ["billId"])
     .index("by_stripe_customer", ["stripeCustomerId"]),
+  reactions: defineTable({
+    profileId: v.id("profiles"),
+    emoji: v.string(),
+    visitorId: v.string(),
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_profile_visitor_emoji", ["profileId", "visitorId", "emoji"]),
 });

@@ -10,6 +10,7 @@ import { Menu, X, LayoutDashboard } from "lucide-react";
 const navLinks = [
   { label: "Features", href: "/#features" },
   { label: "How it works", href: "/#how" },
+  { label: "Discover", href: "/discovery" },
   { label: "Pricing", href: "/pricing" },
   { label: "Docs", href: "/docs" },
 ];

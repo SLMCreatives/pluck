@@ -15,6 +15,12 @@ export const ourFileRouter = {
       return { url: file.ufsUrl };
     }),
 
+  coverImage: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+    .middleware(() => ({}))
+    .onUploadComplete(({ file }) => {
+      return { url: file.ufsUrl };
+    }),
+
   companyLogo: f({ image: { maxFileSize: "1MB", maxFileCount: 1 } })
     .middleware(() => ({}))
     .onUploadComplete(({ file }) => {

@@ -137,7 +137,7 @@ export default function StartupPage() {
       case "onboarding":
         return (
           <StepOnboarding
-            data={{ fullName: portfolioData.fullName, professionalTitle: portfolioData.professionalTitle, bio: portfolioData.bio, profileImage: portfolioData.profileImage }}
+            data={{ fullName: portfolioData.fullName, professionalTitle: portfolioData.professionalTitle, bio: portfolioData.bio, profileImage: portfolioData.profileImage, coverImage: portfolioData.coverImage }}
             onUpdate={updateBasicInfo}
             onNext={() => setStep("social")}
           />

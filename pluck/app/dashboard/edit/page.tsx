@@ -57,6 +57,7 @@ export default function EditProfilePage() {
         professionalTitle: profile.professionalTitle,
         bio: profile.bio,
         profileImage: profile.profileImage,
+        coverImage: profile.coverImage ?? "",
         phone: profile.phone ?? "",
         showPhone: profile.showPhone ?? false,
         socialLinks: profile.socialLinks ?? [],
@@ -122,7 +123,7 @@ export default function EditProfilePage() {
       case "onboarding":
         return (
           <StepOnboarding
-            data={{ fullName: portfolioData.fullName, professionalTitle: portfolioData.professionalTitle, bio: portfolioData.bio, profileImage: portfolioData.profileImage }}
+            data={{ fullName: portfolioData.fullName, professionalTitle: portfolioData.professionalTitle, bio: portfolioData.bio, profileImage: portfolioData.profileImage, coverImage: portfolioData.coverImage }}
             onUpdate={updateBasicInfo}
             onNext={() => setStep("social")}
           />

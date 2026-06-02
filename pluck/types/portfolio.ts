@@ -38,6 +38,7 @@ export interface PortfolioData {
   professionalTitle: string
   bio: string
   profileImage: string
+  coverImage?: string
   phone: string
   showPhone: boolean
   socialLinks: SocialLink[]

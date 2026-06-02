@@ -23,6 +23,8 @@ import {
   AlertTriangle,
   BarChart2,
   Share2,
+  Sun,
+  Moon,
 } from "lucide-react";
 import type { PortfolioData } from "@/types/portfolio";
 
@@ -97,6 +99,7 @@ function Toggle({
 export default function DashboardPage() {
   const profile = useQuery(api.profiles.getMyProfile);
   const setPublished = useMutation(api.profiles.setPublished);
+  const setThemeMutation = useMutation(api.profiles.setTheme);
   const { signOut } = useAuthActions();
   const router = useRouter();
 
@@ -122,6 +125,7 @@ export default function DashboardPage() {
     professionalTitle: profile.professionalTitle,
     bio: profile.bio,
     profileImage: profile.profileImage,
+    coverImage: profile.coverImage ?? "",
     phone: profile.phone ?? "",
     showPhone: profile.showPhone ?? false,
     socialLinks: profile.socialLinks ?? [],
@@ -345,6 +349,38 @@ export default function DashboardPage() {
             {shareToast && <p className="text-xs text-emerald-400">{shareToast}</p>}
           </div>
 
+          {/* Theme */}
+          <div className="rounded-3xl border border-white/10 bg-white/3 p-5">
+            <div className="flex items-center gap-2 text-zinc-400 mb-4">
+              <Sun className="h-4 w-4" />
+              <p className="text-xs font-semibold uppercase tracking-wider">Profile Theme</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setThemeMutation({ theme: "light" })}
+                className={`flex items-center justify-center gap-2 rounded-2xl border py-3 text-sm font-semibold transition ${
+                  (profile.theme ?? "light") === "light"
+                    ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
+                    : "border-white/10 bg-white/3 text-zinc-400 hover:border-white/20 hover:text-white"
+                }`}
+              >
+                <Sun className="h-4 w-4" />
+                Light
+              </button>
+              <button
+                onClick={() => setThemeMutation({ theme: "dark" })}
+                className={`flex items-center justify-center gap-2 rounded-2xl border py-3 text-sm font-semibold transition ${
+                  profile.theme === "dark"
+                    ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
+                    : "border-white/10 bg-white/3 text-zinc-400 hover:border-white/20 hover:text-white"
+                }`}
+              >
+                <Moon className="h-4 w-4" />
+                Dark
+              </button>
+            </div>
+          </div>
+
           {/* Plan & Billing — compact */}
           <div className="rounded-3xl border border-white/10 bg-white/3 p-5">
             <div className="flex items-center justify-between gap-3">
@@ -392,7 +428,7 @@ export default function DashboardPage() {
 
         {/* ── Right panel — phone preview (desktop only) ── */}
         <div className="hidden lg:block">
-          <PhoneMockup data={data} activeTab={data.tabs[0]?.id} />
+          <PhoneMockup data={data} activeTab={data.tabs[0]?.id} initialTheme={profile.theme ?? "light"} />
         </div>
       </div>
     </div>

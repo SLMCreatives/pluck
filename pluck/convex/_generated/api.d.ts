@@ -13,6 +13,7 @@ import type * as billplz from "../billplz.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as profiles from "../profiles.js";
+import type * as reactions from "../reactions.js";
 import type * as stripe from "../stripe.js";
 
 import type {
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   http: typeof http;
   profiles: typeof profiles;
+  reactions: typeof reactions;
   stripe: typeof stripe;
 }>;
 

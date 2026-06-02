@@ -20,11 +20,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import Link from "next/link";
+import type { Id } from "@/convex/_generated/dataModel";
+import { InlineEmojiReactions } from "@/components/emoji-reactions";
 
 interface PortfolioPreviewProps {
   data: PortfolioData;
   activeTab?: string;
   showBadge?: boolean;
+  profileId?: Id<"profiles">;
+  initialTheme?: "light" | "dark";
 }
 
 const SOCIAL_ICONS: Record<string, any> = {
@@ -67,8 +71,11 @@ export function PortfolioPreview({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   activeTab: _activeTab,
   showBadge = true,
+  profileId,
+  initialTheme = "light",
 }: PortfolioPreviewProps) {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">(initialTheme);
+  useEffect(() => { setTheme(initialTheme); }, [initialTheme]);
   const light = theme === "light";
 
   const socials = useMemo(
@@ -148,27 +155,47 @@ export function PortfolioPreview({
       {/* Constrained content wrapper */}
       <div className="mx-auto max-w-md sm:max-w-2xl">
 
-      {/* Top bar — theme toggle */}
-      <div className="flex items-center justify-end px-5 pt-5 pb-1">
-        <button
-          onClick={() => setTheme(light ? "dark" : "light")}
-          aria-label="Toggle theme"
-          className={`grid h-9 w-9 place-items-center rounded-full border transition-all duration-200 active:scale-95 ${
-            light
-              ? "border-slate-200 bg-white text-slate-500 shadow-sm hover:border-slate-300 hover:text-slate-700"
-              : "border-white/10 bg-white/5 text-zinc-400 hover:border-white/20 hover:text-white"
-          }`}
-        >
-          {light ? (
-            <Moon className="h-[15px] w-[15px]" />
-          ) : (
-            <Sun className="h-[15px] w-[15px]" />
-          )}
-        </button>
-      </div>
+      {/* ── Cover photo (or plain top bar) ── */}
+      {data.coverImage ? (
+        <div className="relative h-44 w-full overflow-hidden">
+          <img src={data.coverImage} alt="Cover" className="h-full w-full object-cover" />
+          {/* Scrim so avatar ring blends */}
+          <div
+            className={`absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t ${
+              light ? "from-[#F7F7FA]" : "from-[#080808]"
+            } to-transparent`}
+          />
+          {/* Theme toggle overlaid */}
+          <button
+            onClick={() => setTheme(light ? "dark" : "light")}
+            aria-label="Toggle theme"
+            className={`absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border backdrop-blur transition-all duration-200 active:scale-95 ${
+              light
+                ? "border-white/60 bg-white/80 text-slate-600 hover:bg-white"
+                : "border-white/15 bg-black/50 text-zinc-300 hover:text-white"
+            }`}
+          >
+            {light ? <Moon className="h-[15px] w-[15px]" /> : <Sun className="h-[15px] w-[15px]" />}
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-end px-5 pt-5 pb-1">
+          <button
+            onClick={() => setTheme(light ? "dark" : "light")}
+            aria-label="Toggle theme"
+            className={`grid h-9 w-9 place-items-center rounded-full border transition-all duration-200 active:scale-95 ${
+              light
+                ? "border-slate-200 bg-white text-slate-500 shadow-sm hover:border-slate-300 hover:text-slate-700"
+                : "border-white/10 bg-white/5 text-zinc-400 hover:border-white/20 hover:text-white"
+            }`}
+          >
+            {light ? <Moon className="h-[15px] w-[15px]" /> : <Sun className="h-[15px] w-[15px]" />}
+          </button>
+        </div>
+      )}
 
       {/* ── Hero ── */}
-      <div className="px-6 pb-6 pt-3 text-center">
+      <div className={`px-6 pb-6 text-center ${data.coverImage ? "-mt-14" : "pt-3"}`}>
         {/* Avatar with soft halo */}
         <div className="relative mx-auto w-fit">
           <div
@@ -178,10 +205,10 @@ export function PortfolioPreview({
             style={{ inset: "-14px" }}
           />
           <Avatar
-            className={`relative h-24 w-24 ring-[3px] transition-all duration-300 ${
+            className={`relative h-24 w-24 ring-4 transition-all duration-300 ${
               light
-                ? "ring-white shadow-lg shadow-indigo-100/60"
-                : "ring-zinc-800"
+                ? "ring-[#F7F7FA] shadow-lg shadow-indigo-100/60"
+                : "ring-[#080808]"
             }`}
           >
             <AvatarImage
@@ -263,7 +290,7 @@ export function PortfolioPreview({
       </div>
 
       {/* ── Content sections ── */}
-      <div className="space-y-8 px-5 pb-32">
+      <div className="space-y-8 px-5 pb-8">
         {data.tabs.map((tab) =>
           tab.blocks.length > 0 ? (
             <section key={tab.id}>
@@ -290,6 +317,13 @@ export function PortfolioPreview({
           ) : null
         )}
       </div>
+
+      {/* ── Emoji reactions ── */}
+      {profileId && (
+        <div className="px-5 pb-4">
+          <InlineEmojiReactions profileId={profileId} light={light} />
+        </div>
+      )}
 
       {/* ── Footer badge ── */}
       {showBadge && (
@@ -322,36 +356,114 @@ export function PortfolioPreview({
 
       </div>{/* end max-w-md wrapper */}
 
-      {/* ── CTA button — fixed to viewport bottom ── */}
-      {contactHref &&
-        (() => {
-          const Icon = contactIcon(contactHref);
-          const isNative =
-            contactHref.startsWith("tel:") ||
-            contactHref.startsWith("mailto:");
-          return (
-            <div
-              className={`fixed inset-x-0 bottom-0 z-40 pt-8 transition-colors duration-300 ${
-                light
-                  ? "bg-gradient-to-t from-[#F7F7FA] via-[#F7F7FA]/95 to-transparent"
-                  : "bg-gradient-to-t from-[#080808] via-[#080808]/95 to-transparent"
-              }`}
-            >
-              <div className="mx-auto max-w-md px-5 pb-6 sm:max-w-2xl">
-                <a
-                  href={contactHref}
-                  target={isNative ? "_self" : "_blank"}
-                  rel="noopener noreferrer"
-                  className="flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl bg-indigo-600 text-sm font-bold text-white shadow-[0_8px_32px_rgba(99,102,241,0.32)] transition-all duration-200 hover:bg-indigo-500 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(99,102,241,0.44)] active:translate-y-0 active:scale-[0.98]"
-                >
-                  <Icon className="h-[15px] w-[15px]" />
-                  Let&apos;s work together
-                </a>
-              </div>
-            </div>
-          );
-        })()}
+      {/* ── FAB + contact sheet ── */}
+      {contactHref && (
+        <ContactFab
+          href={contactHref}
+          name={data.fullName}
+          light={light}
+        />
+      )}
     </div>
+  );
+}
+
+function contactPlatform(href: string) {
+  if (href.includes("wa.me")) return "WhatsApp";
+  if (href.startsWith("tel:")) return "Phone";
+  if (href.startsWith("mailto:")) return "Email";
+  return "website";
+}
+
+function ContactFab({
+  href,
+  name,
+  light,
+}: {
+  href: string;
+  name: string;
+  light: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const Icon = contactIcon(href);
+  const platform = contactPlatform(href);
+  const isNative = href.startsWith("tel:") || href.startsWith("mailto:");
+
+  return (
+    <>
+      {/* FAB */}
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Contact"
+        className="fixed bottom-6 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-[0_8px_32px_rgba(99,102,241,0.45)] transition-all duration-200 hover:bg-indigo-500 hover:scale-105 active:scale-95"
+      >
+        <Icon className="h-5 w-5" />
+      </button>
+
+      {/* Backdrop */}
+      {open && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* Bottom sheet */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-50 transition-transform duration-300 ease-out ${
+          open ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div
+          className={`mx-auto max-w-md rounded-t-3xl px-6 pb-10 pt-5 shadow-2xl ${
+            light ? "bg-white" : "bg-zinc-900"
+          }`}
+        >
+          {/* Drag handle */}
+          <div
+            className={`mx-auto mb-5 h-1 w-10 rounded-full ${
+              light ? "bg-slate-200" : "bg-white/10"
+            }`}
+          />
+
+          <div className="mb-6 flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600/15">
+              <Icon className="h-5 w-5 text-indigo-500" />
+            </div>
+            <div>
+              <p className={`text-xs font-medium ${light ? "text-slate-400" : "text-zinc-500"}`}>
+                Get in touch with
+              </p>
+              <p className={`text-base font-bold ${light ? "text-slate-900" : "text-white"}`}>
+                {name}
+              </p>
+            </div>
+          </div>
+
+          <a
+            href={href}
+            target={isNative ? "_self" : "_blank"}
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+            className="flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl bg-indigo-600 text-sm font-bold text-white shadow-[0_4px_20px_rgba(99,102,241,0.35)] transition-all duration-200 hover:bg-indigo-500 active:scale-[0.98]"
+          >
+            <Icon className="h-4 w-4" />
+            Contact via {platform}
+          </a>
+
+          <button
+            onClick={() => setOpen(false)}
+            className={`mt-3 flex h-12 w-full items-center justify-center rounded-2xl text-sm font-semibold transition ${
+              light
+                ? "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                : "bg-white/6 text-zinc-400 hover:bg-white/10"
+            }`}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
 

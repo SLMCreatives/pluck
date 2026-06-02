@@ -10,6 +10,46 @@ export const get = query({
   },
 });
 
+export const getPublishedProfiles = query({
+  args: {},
+  handler: async (ctx) => {
+    const all = await ctx.db.query("profiles").collect();
+    const published = all.filter((p) => p.published === true);
+
+    const results = await Promise.all(
+      published.map(async (p) => {
+        const reactions = await ctx.db
+          .query("reactions")
+          .withIndex("by_profile", (q) => q.eq("profileId", p._id))
+          .collect();
+
+        const countMap: Record<string, number> = {};
+        for (const r of reactions) {
+          countMap[r.emoji] = (countMap[r.emoji] ?? 0) + 1;
+        }
+        const topReactions = Object.entries(countMap)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 4)
+          .map(([emoji, count]) => ({ emoji, count }));
+
+        return {
+          _id: p._id,
+          slug: p.slug ?? "",
+          fullName: p.fullName,
+          professionalTitle: p.professionalTitle,
+          bio: p.bio,
+          profileImage: p.profileImage,
+          tier: p.tier ?? "free",
+          viewCount: p.viewCount ?? 0,
+          topReactions,
+        };
+      })
+    );
+
+    return results;
+  },
+});
+
 export const getBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
@@ -113,6 +153,7 @@ export const updateProfile = mutation({
     professionalTitle: v.string(),
     bio: v.string(),
     profileImage: v.string(),
+    coverImage: v.optional(v.string()),
     phone: v.optional(v.string()),
     showPhone: v.optional(v.boolean()),
     socialLinks: v.array(v.object({ platform: v.string(), url: v.string() })),
@@ -170,6 +211,20 @@ export const setPublished = mutation({
   },
 });
 
+export const setTheme = mutation({
+  args: { theme: v.union(v.literal("light"), v.literal("dark")) },
+  handler: async (ctx, { theme }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated.");
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .unique();
+    if (!profile) throw new Error("Profile not found.");
+    await ctx.db.patch(profile._id, { theme });
+  },
+});
+
 // Increments the view counter on a public profile visit.
 export const incrementViewCount = mutation({
   args: { slug: v.string() },
@@ -214,6 +269,7 @@ export const saveProfile = mutation({
     professionalTitle: v.string(),
     bio: v.string(),
     profileImage: v.string(),
+    coverImage: v.optional(v.string()),
     phone: v.optional(v.string()),
     showPhone: v.optional(v.boolean()),
     socialLinks: v.array(v.object({ platform: v.string(), url: v.string() })),

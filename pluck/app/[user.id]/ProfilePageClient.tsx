@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { PortfolioPreview } from "@/components/portfolio-preview";
 import type { PortfolioData } from "@/types/portfolio";
 import Link from "next/link";
+import { Pencil } from "lucide-react";
 
 export function ProfilePageClient({
   params,
@@ -15,7 +16,10 @@ export function ProfilePageClient({
   const { "user.id": slug } = use(params);
   const profile = useQuery(api.profiles.getBySlug, { slug });
   const status = useQuery(api.profiles.getPublishStatus, { slug });
+  const myProfile = useQuery(api.profiles.getMyProfile);
   const incrementViewCount = useMutation(api.profiles.incrementViewCount);
+
+  const isOwner = !!(profile && myProfile && profile._id === myProfile._id);
 
   useEffect(() => {
     if (profile) incrementViewCount({ slug });
@@ -81,11 +85,30 @@ export function ProfilePageClient({
     professionalTitle: profile.professionalTitle,
     bio: profile.bio,
     profileImage: profile.profileImage,
+    coverImage: profile.coverImage ?? "",
     phone: profile.phone ?? "",
     showPhone: profile.showPhone ?? false,
     socialLinks: profile.socialLinks ?? [],
     tabs: (profile.tabs ?? []) as PortfolioData["tabs"],
   };
 
-  return <PortfolioPreview data={data} showBadge={!profile.tier || profile.tier === "free"} />;
+  return (
+    <>
+      <PortfolioPreview
+        data={data}
+        showBadge={!profile.tier || profile.tier === "free"}
+        profileId={profile._id}
+        initialTheme={profile.theme ?? "light"}
+      />
+      {isOwner && (
+        <Link
+          href="/dashboard/edit"
+          className="fixed left-4 top-4 z-50 flex items-center gap-2 rounded-full border border-white/15 bg-black/70 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-black/90"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+          Edit profile
+        </Link>
+      )}
+    </>
+  );
 }
