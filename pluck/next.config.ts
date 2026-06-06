@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { hostname: "encrypted-tbn0.gstatic.com" },
       { hostname: "*.ufs.sh" },
       { hostname: "images.unsplash.com" },
+      { hostname: "randomuser.me" },
     ],
   }
 };

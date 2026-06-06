@@ -15,6 +15,7 @@ import type * as http from "../http.js";
 import type * as profiles from "../profiles.js";
 import type * as reactions from "../reactions.js";
 import type * as stripe from "../stripe.js";
+import type * as testimonials from "../testimonials.js";
 
 import type {
   ApiFromModules,
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   profiles: typeof profiles;
   reactions: typeof reactions;
   stripe: typeof stripe;
+  testimonials: typeof testimonials;
 }>;
 
 /**

@@ -16,7 +16,7 @@ import { StepBlocks } from "@/components/wizard/step-blocks";
 import { BlockForm } from "@/components/wizard/block-forms";
 import { StepTabs } from "@/components/wizard/step-tabs";
 import { Button } from "@/components/ui/button";
-import { LogOut, Check } from "lucide-react";
+import { LogOut, Check, Copy, CheckCheck, ArrowRight, Share2 } from "lucide-react";
 import { FREE_LIMITS, countTotalBlocks, countTotalImages } from "@/lib/limits";
 
 const STORAGE_KEY = "pluck_pending_portfolio";
@@ -34,6 +34,7 @@ export default function StartupPage() {
   const [currentTabId, setCurrentTabId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [launchSlug, setLaunchSlug] = useState<string | null>(null);
 
   const [portfolioData, setPortfolioData] = useState<PortfolioData>({
     fullName: "",
@@ -124,8 +125,8 @@ export default function StartupPage() {
     setSaving(true);
     setSaveError(null);
     try {
-      await saveProfile({ ...portfolioData });
-      router.push("/dashboard");
+      const result = await saveProfile({ ...portfolioData });
+      setLaunchSlug(result.slug);
     } catch (err: unknown) {
       setSaveError(err instanceof Error ? err.message : "Something went wrong.");
       setSaving(false);
@@ -246,6 +247,11 @@ export default function StartupPage() {
     </header>
   );
 
+  // Launch celebration overlay
+  if (launchSlug !== null) {
+    return <LaunchCelebration slug={launchSlug} name={portfolioData.fullName} title={portfolioData.professionalTitle} />;
+  }
+
   // Preview step: full-screen portfolio with sticky publish bar
   if (step === "preview") {
     return (
@@ -317,6 +323,112 @@ export default function StartupPage() {
             <PhoneMockup data={portfolioData} activeTab={portfolioData.tabs[0]?.id} />
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Launch Celebration Screen
+// ============================================================
+function LaunchCelebration({
+  slug,
+  name,
+  title,
+}: {
+  slug: string;
+  name: string;
+  title: string;
+}) {
+  const router = useRouter();
+  const url = `gopeek.my/${slug}`;
+  const fullUrl = `https://gopeek.my/${slug}`;
+  const caption = `My freelancer portfolio is live. Check it out 👉 ${fullUrl}`;
+
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedCaption, setCopiedCaption] = useState(false);
+
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(fullUrl);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
+  const copyCaption = async () => {
+    await navigator.clipboard.writeText(caption);
+    setCopiedCaption(true);
+    setTimeout(() => setCopiedCaption(false), 2000);
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 px-6 text-white">
+      {/* glow */}
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute left-1/2 top-1/3 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/20 blur-3xl" />
+      </div>
+
+      <div className="w-full max-w-md space-y-6">
+        {/* checkmark */}
+        <div className="flex justify-center">
+          <div className="grid h-16 w-16 place-items-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/40">
+            <Check className="h-8 w-8 text-emerald-400" />
+          </div>
+        </div>
+
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold">You&apos;re live!</h1>
+          <p className="mt-2 text-zinc-400">Your portfolio is out in the world.</p>
+        </div>
+
+        {/* Shareable card */}
+        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 text-center space-y-1">
+          <p className="text-sm font-semibold text-white">{name}</p>
+          {title && <p className="text-xs text-zinc-400">{title}</p>}
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-mono text-sm font-medium text-emerald-300">{url}</span>
+          </div>
+        </div>
+
+        {/* Copy link */}
+        <button
+          onClick={copyLink}
+          className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm transition hover:bg-white/10"
+        >
+          <span className="text-zinc-300">Copy your portfolio link</span>
+          {copiedLink ? (
+            <CheckCheck className="h-4 w-4 text-emerald-400" />
+          ) : (
+            <Copy className="h-4 w-4 text-zinc-500" />
+          )}
+        </button>
+
+        {/* Pre-written caption */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            Share to Instagram / WhatsApp Stories
+          </p>
+          <p className="text-sm leading-relaxed text-zinc-300">{caption}</p>
+          <button
+            onClick={copyCaption}
+            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-white/10"
+          >
+            {copiedCaption ? (
+              <><CheckCheck className="h-3.5 w-3.5 text-emerald-400" /> Copied!</>
+            ) : (
+              <><Copy className="h-3.5 w-3.5" /> Copy caption</>
+            )}
+          </button>
+        </div>
+
+        {/* Dashboard CTA */}
+        <Button
+          onClick={() => router.push("/dashboard")}
+          className="h-12 w-full rounded-2xl bg-white text-black hover:bg-zinc-900 hover:text-white transition-colors"
+        >
+          Go to your dashboard
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

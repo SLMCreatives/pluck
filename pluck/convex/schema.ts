@@ -46,6 +46,13 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_bill", ["billId"])
     .index("by_stripe_customer", ["stripeCustomerId"]),
+  testimonials: defineTable({
+    name: v.string(),
+    role: v.string(),
+    quote: v.string(),
+    rating: v.number(),
+    approved: v.optional(v.boolean()),
+  }).index("by_approved", ["approved"]),
   reactions: defineTable({
     profileId: v.id("profiles"),
     emoji: v.string(),

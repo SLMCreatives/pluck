@@ -7,6 +7,7 @@ import Image from "next/image";
 import { headers } from "next/headers";
 import { SiteHeader } from "@/components/site-header";
 import { MockupHero } from "@/components/mockup-hero";
+import { TestimonialsSection } from "@/components/testimonials-section";
 
 export const metadata: Metadata = {
   title: "First 100 Freelancers Get GoPeek Free for 3 Months",
@@ -147,21 +148,28 @@ const faqs = [
   }
 ];
 
-const testimonials = [
+
+const personas = [
   {
-    quote: "Took me less than 10 minutes. I sent the link to a client the same day and got a reply within the hour.",
-    name: "Amirah R.",
-    role: "Graphic designer, KL",
+    img: "https://images.unsplash.com/photo-1520333789090-1afc82db536a?auto=format&fit=crop&w=600&q=80",
+    label: "Just landing your first client",
+    name: "The New Freelancer",
+    desc: "You've got skills but no portfolio yet. A client asks for your work and you freeze. GoPeek gets you from zero to live in one afternoon — free.",
+    cta: "Start for free →",
   },
   {
-    quote: "I kept putting off building a website for two years. GoPeek got me live in one lunch break.",
-    name: "Faiz H.",
-    role: "Video editor & content creator",
+    img: "https://images.unsplash.com/photo-1698047681820-f26b00b6c639?auto=format&fit=crop&w=600&q=80",
+    label: "Side hustle going full-time",
+    name: "The Career Switcher",
+    desc: "You're serious now. You need something professional to send before the competition does. One clean link changes how clients see you.",
+    cta: "Build yours free →",
   },
   {
-    quote: "The WhatsApp contact button alone is worth it. Clients message me directly from my portfolio link.",
-    name: "Siti N.",
-    role: "Freelance copywriter, Penang",
+    img: "https://images.unsplash.com/photo-1758518730380-04c8e0d57b68?auto=format&fit=crop&w=600&q=80",
+    label: "Tired of the Google Drive shuffle",
+    name: "The Experienced Pro",
+    desc: "You've been freelancing for years but still send scattered links and PDFs. GoPeek puts everything in one place — polished and shareable.",
+    cta: "Upgrade your presence →",
   },
 ];
 
@@ -249,15 +257,12 @@ export default async function Page() {
             <Badge>For Malaysian freelancers • 5-minute setup • Free to start</Badge>
 
             <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-              The fastest way to look professional before a client asks,{" "}
-              <span className="text-zinc-400">&ldquo;Can I see your work?&rdquo;</span>
+              When Clients Ask for Your Work,{" "}
+              <span className="text-zinc-400">Send One Clean Link.</span>
             </h1>
 
             <p className="text-pretty text-base leading-relaxed text-zinc-300 sm:text-lg">
-              GoPeek helps Malaysian freelancers build a client-ready portfolio
-              in 5 minutes — with WhatsApp lead capture and a clean
-              gopeek.my link. No design skills. No dead Google Drive folders.
-              Just one link that does the talking.
+              GoPeek turns your scattered files, images, and videos into a professional portfolio you can share instantly.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -338,37 +343,145 @@ export default async function Page() {
         </div>
       </section>
 
-      {/* DEMO SHOWCASE */}
+      {/* SCENARIO BANNER */}
       <section className="mx-auto max-w-6xl px-6 pb-10">
-        <div className="rounded-3xl border border-white/10 bg-white/3 p-6 sm:p-8">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">See it live</p>
-              <h2 className="text-xl font-semibold text-white">
-                This is what your portfolio looks like.
-              </h2>
-              <p className="text-sm text-zinc-400">
-                A real GoPeek portfolio — built in 5 minutes, live at a shareable link.
+        <div className="relative overflow-hidden rounded-3xl">
+          <Image
+            src="https://images.unsplash.com/photo-1664575602276-acd073f104c1?auto=format&fit=crop&w=1400&q=80"
+            alt="Malaysian freelancer working on a laptop"
+            width={1400}
+            height={560}
+            className="h-64 w-full object-cover sm:h-80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+          <div className="absolute inset-0 flex items-center px-8 sm:px-12">
+            <div className="max-w-md space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Sound familiar?</p>
+              <blockquote className="text-xl font-semibold leading-snug text-white sm:text-2xl">
+                &ldquo;Can you send me your portfolio?&rdquo;
+              </blockquote>
+              <p className="text-sm leading-relaxed text-zinc-300">
+                Every freelancer gets that message. The ones who reply instantly with a clean link — they win the job. GoPeek makes sure that&apos;s you.
               </p>
-              <div className="flex items-center gap-2 pt-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-sm text-zinc-300">gopeek.my/sulaimanshafiq</span>
+              <PrimaryCTA href="/startup">Build mine — it&apos;s free</PrimaryCTA>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHO IT'S FOR */}
+      <section className="mx-auto max-w-6xl px-6 pb-10">
+        <SectionHeader
+          kicker="Who it's for"
+          title="Wherever you are in your freelance journey."
+          subtitle="Whether you just landed your first client or you've been freelancing for years — GoPeek gets you looking the part."
+        />
+        <div className="mt-8 grid gap-5 sm:grid-cols-3">
+          {personas.map((p) => (
+            <div key={p.name} className="group overflow-hidden rounded-3xl border border-white/10 bg-white/3">
+              <div className="relative h-44 overflow-hidden">
+                <Image
+                  src={p.img}
+                  alt={p.label}
+                  fill
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <span className="absolute bottom-3 left-4 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-300 backdrop-blur-sm">
+                  {p.label}
+                </span>
+              </div>
+              <div className="p-5 space-y-3">
+                <h3 className="text-sm font-semibold text-white">{p.name}</h3>
+                <p className="text-sm leading-relaxed text-zinc-400">{p.desc}</p>
+                <Link href="/startup" className="inline-flex text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                  {p.cta}
+                </Link>
               </div>
             </div>
-            <div className="flex flex-col gap-3 sm:items-end">
-              <Link
-                href="/sulaimanshafiq"
-                target="_blank"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-zinc-200 transition-colors"
-              >
-                View Demo Portfolio ↗
-              </Link>
-              <Link
-                href="/startup"
-                className="text-xs text-zinc-500 hover:text-zinc-300 transition"
-              >
-                Build yours free →
-              </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* DEMO SHOWCASE */}
+      <section className="mx-auto max-w-6xl px-6 pb-10">
+        <div className="space-y-4">
+          <div className="max-w-xl">
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Real portfolios, live now</p>
+            <h2 className="mt-2 text-xl font-semibold text-white">
+              The guy who built this uses it too.
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              Not a demo. Not a mock. Real people, real work, live links.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* Founder card */}
+            <div className="flex flex-col gap-4 rounded-3xl border border-indigo-500/30 bg-indigo-500/5 p-6">
+              <div className="flex items-center gap-3">
+                <Image
+                  src="/sulaiman.jpg"
+                  alt="Sulaiman"
+                  width={44}
+                  height={44}
+                  className="rounded-full object-cover ring-2 ring-indigo-500/30"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-white">Sulaiman</p>
+                  <p className="text-xs text-zinc-400">Founder, GoPeek · Web Designer</p>
+                </div>
+                <span className="ml-auto rounded-full bg-indigo-500/20 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-400">
+                  Founder
+                </span>
+              </div>
+              <p className="text-xs leading-relaxed text-zinc-400">
+                &ldquo;I built GoPeek because I was tired of sending dead links to clients. This is my own portfolio — built and live in 5 minutes.&rdquo;
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-mono text-xs text-zinc-400">gopeek.my/sulaimanshafiq</span>
+                </div>
+                <Link
+                  href="/sulaimanshafiq"
+                  target="_blank"
+                  className="inline-flex items-center gap-1 rounded-xl bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/20 transition-colors"
+                >
+                  View ↗
+                </Link>
+              </div>
+            </div>
+
+            {/* Beta user placeholder — update with real slug when available */}
+            <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/3 p-6">
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/10 text-base font-bold text-white">
+                  A
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">Amirah R.</p>
+                  <p className="text-xs text-zinc-400">Graphic Designer · KL</p>
+                </div>
+                <span className="ml-auto rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
+                  Beta
+                </span>
+              </div>
+              <p className="text-xs leading-relaxed text-zinc-400">
+                &ldquo;Took me less than 10 minutes. I sent the link to a client the same day and got a reply within the hour.&rdquo;
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-mono text-xs text-zinc-400">gopeek.my/amirah</span>
+                </div>
+                <Link
+                  href="/startup"
+                  className="inline-flex items-center gap-1 rounded-xl bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/20 transition-colors"
+                >
+                  Build yours →
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -492,31 +605,7 @@ export default async function Page() {
       </section>
 
       {/* SOCIAL PROOF */}
-      <section className="mx-auto max-w-6xl px-6 py-14">
-        <SectionHeader
-          kicker="Early users"
-          title="Freelancers already using GoPeek."
-          subtitle="Real feedback from our beta community."
-        />
-        <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          {testimonials.map((t) => (
-            <Card key={t.name} className="p-6">
-              <p className="text-sm leading-relaxed text-zinc-300">
-                &ldquo;{t.quote}&rdquo;
-              </p>
-              <div className="mt-4 flex items-center gap-3">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-sm font-bold text-white">
-                  {t.name[0]}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">{t.name}</p>
-                  <p className="text-xs text-zinc-500">{t.role}</p>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
+      <TestimonialsSection />
 
       {/* HOW IT WORKS */}
       <section id="how" className="mx-auto max-w-6xl px-6 py-14">
@@ -617,28 +706,33 @@ export default async function Page() {
 
       {/* CTA BANNER */}
       <section id="start" className="mx-auto max-w-6xl px-6 py-14">
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/4 p-8 sm:p-10">
-          <div className="pointer-events-none absolute inset-0 opacity-40">
-            <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-indigo-500 blur-3xl" />
-            <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-emerald-500 blur-3xl" />
-          </div>
+        <div className="relative overflow-hidden rounded-3xl">
+          {/* Background photo */}
+          <Image
+            src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1400&q=80"
+            alt="Freelancer confidently sharing their work on a laptop"
+            width={1400}
+            height={500}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/50" />
 
-          <div className="relative flex flex-col items-center gap-6 text-center">
+          <div className="relative flex flex-col items-start gap-6 p-8 sm:p-12 lg:max-w-xl">
             <h2 className="text-balance text-2xl font-semibold sm:text-3xl">
               Next time a client asks — you&apos;ll be ready.
             </h2>
-            <p className="max-w-lg text-sm leading-relaxed text-zinc-300 sm:text-base">
+            <p className="text-sm leading-relaxed text-zinc-300 sm:text-base">
               Build your portfolio for free and go live instantly. Share one
               clean gopeek.my link — with your work, your story, and a
               WhatsApp button that brings clients straight to you.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <PrimaryCTA href="/startup">
-                Build My Portfolio — It's Free
+                Build My Portfolio — It&apos;s Free
               </PrimaryCTA>
               <Link
                 href="#faq"
-                className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/20 backdrop-blur-sm"
               >
                 Read FAQ
               </Link>

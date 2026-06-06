@@ -4,16 +4,15 @@ import { PortfolioPreview } from "@/components/portfolio-preview";
 import type { PortfolioData } from "@/types/portfolio";
 
 const MOCK: PortfolioData = {
-  fullName: "Aisha Rahman",
-  professionalTitle: "Brand & Motion Designer",
-  bio: "Crafting visual identities that make brands impossible to ignore. 4+ years across FMCG, tech, and lifestyle categories.",
-  profileImage: "https://randomuser.me/api/portraits/women/42.jpg",
-  phone: "+60123456789",
-  showPhone: true,
+  fullName: "Sulaiman",
+  professionalTitle: "Web Designer & Digital Strategist",
+  bio: "I build clean, fast digital experiences for Malaysian brands and freelancers. Founder of GoPeek — because every freelancer deserves a portfolio that works as hard as they do.",
+  profileImage: "/sulaiman.jpg",
+  phone: "",
+  showPhone: false,
   socialLinks: [
-    { platform: "instagram", url: "https://instagram.com" },
-    { platform: "linkedin", url: "https://linkedin.com" },
-    { platform: "behance", url: "https://behance.net" }
+    { platform: "linkedin", url: "https://www.linkedin.com/in/sulaiman-shafiq-208054193/" },
+    { platform: "website", url: "https://slmcreatives.com" }
   ],
   tabs: [
     {
@@ -24,49 +23,44 @@ const MOCK: PortfolioData = {
           type: "gallery",
           images: [
             {
-              url: "https://picsum.photos/seed/pluck-a/400/520",
-              alt: "Brand identity — Kopi Kita Co."
+              url: "https://picsum.photos/seed/slm-a/400/520",
+              alt: "GoPeek — portfolio builder"
             },
             {
-              url: "https://picsum.photos/seed/pluck-b/400/600",
-              alt: "Campaign — Nestlé MY 2024"
+              url: "https://picsum.photos/seed/slm-b/400/600",
+              alt: "Brand identity — SLM Creatives"
             },
             {
-              url: "https://picsum.photos/seed/pluck-c/500/420",
-              alt: "UI Design — fintech app"
+              url: "https://picsum.photos/seed/slm-c/500/420",
+              alt: "Web design — client project"
             },
             {
-              url: "https://picsum.photos/seed/pluck-d/400/480",
-              alt: "Packaging — skincare brand"
+              url: "https://picsum.photos/seed/slm-d/400/480",
+              alt: "UI — dashboard redesign"
             }
           ]
-        },
-        {
-          type: "video",
-          url: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
-          title: "Brand reel — 2024 highlights"
         }
       ]
     },
     {
       id: "xp",
-      name: "Experience",
+      name: "About",
       blocks: [
         {
           type: "experience",
-          title: "Senior Brand Designer",
-          company: "Kasama Studio",
-          period: "2022 — Present",
+          title: "Founder",
+          company: "GoPeek",
+          period: "2025 — Present",
           description:
-            "Led visual identity work for 12+ regional brands. Owned the motion design pipeline end-to-end and managed a team of 3 junior designers."
+            "Building the simplest portfolio builder for Malaysian freelancers. GoPeek lets you go live in 5 minutes — no design skills needed."
         },
         {
           type: "experience",
-          title: "Visual Designer",
-          company: "BBDO Malaysia",
-          period: "2020 — 2022",
+          title: "Creative Director",
+          company: "SLM Creatives",
+          period: "2020 — Present",
           description:
-            "Campaign assets for Maxis, Digi, and McDonald's Malaysia. Specialised in OOH and digital production."
+            "Web design, brand strategy, and digital campaigns for SMEs and startups across Malaysia."
         }
       ]
     }
@@ -89,7 +83,7 @@ export function MockupHero() {
             <span className="h-3 w-3 rounded-full bg-green-400/60" />
           </div>
           <div className="rounded-md bg-white/5 px-4 py-1.5 text-[11px] font-medium text-zinc-400">
-            gopeek.my/aisha
+            gopeek.my/sulaimanshafiq
           </div>
           <div className="w-14" />
         </div>

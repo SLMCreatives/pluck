@@ -287,18 +287,19 @@ export const saveProfile = mutation({
     if (existing) {
       if ((existing.tier ?? "free") === "free") validateFreeLimits(args.tabs);
       await ctx.db.patch(existing._id, { ...args });
-      return existing._id;
+      return { id: existing._id, slug: existing.slug ?? "" };
     }
 
     validateFreeLimits(args.tabs);
     const slug = await generateUniqueSlug(ctx as any);
-    return await ctx.db.insert("profiles", {
+    const id = await ctx.db.insert("profiles", {
       ...args,
       slug,
       published: true,
       tier: "free",
       userId,
     });
+    return { id, slug };
   },
 });
 
